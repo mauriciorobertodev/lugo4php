@@ -1,5 +1,8 @@
 {
     "name": "mrdev/lugo4php",
+    "description": "Cliente PHP para Lugo Bots",
+    "version": "0.0.1-dev",
+    "license": "MIT",
     "autoload": {
           "psr-4": {
             "Lugo4php\\": "src/"
@@ -12,12 +15,6 @@
             "src/helpers.php"
         ]
     },
-     "extra": {
-        "exclude": [
-            "./example",
-            "./protos"
-        ]
-    },
     "authors": [
         {
             "name": "Mauricio Roberto",
@@ -27,6 +24,6 @@
     "require": {
         "google/protobuf": "^4.28",
         "grpc/grpc": "^1.57",
-        "vlucas/phpdotenv": "^5.6"
+        "php": "^8.3.11"
     }
 }
