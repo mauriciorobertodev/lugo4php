@@ -1,0 +1,28 @@
+{
+    "name": "example/bot",
+    "autoload": {
+        "psr-4": {
+            "Example\\Bot\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mauricio Roberto",
+            "email": "mauricio.roberto.dev@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "options": {
+                "symlink": true
+            },
+            "type": "path",
+            "url": "../../"
+        }
+    ],
+    "require": {
+        "mrdev/lugo4php": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,5 @@
+example/ export-ignore
+protos/ export-ignore
+vendor/ export-ignore
+.docker/ export-ignore
+Makefile export-ignore

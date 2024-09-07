@@ -1,0 +1,32 @@
+{
+    "name": "mrdev/lugo4php",
+    "autoload": {
+          "psr-4": {
+            "Lugo4php\\": "src/"
+        },
+        "classmap": [
+            "output/Lugo/",
+            "output/GPBMetadata/"
+        ],
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+     "extra": {
+        "exclude": [
+            "./example",
+            "./protos"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Mauricio Roberto",
+            "email": "mauricio.roberto.dev@gmail.com"
+        }
+    ],
+    "require": {
+        "google/protobuf": "^4.28",
+        "grpc/grpc": "^1.57",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

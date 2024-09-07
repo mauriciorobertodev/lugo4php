@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+import "physics.proto";
+
+package lugo;
+
+option go_package = "github.com/lugobots/lugo4go/proto";
+
+// Service provided by the game service to the players (clients).
+service Game {
+    // JoinATeam allows the player to listen the server during the match.
+    rpc JoinATeam (JoinRequest) returns (stream GameSnapshot);
+    // SendOrders allows the player to send others to the server when the game is on listening state.
+    rpc SendOrders (OrderSet) returns (OrderResponse);
+}
+
+// JoinRequest define the player configuration to the game.
+message JoinRequest {
+    // Only used in official matches to guarantee that only one process will assume that player position (team and number).
+    // The bot process will receive this token as an argument, and must send it to the server in this message.
+    string token = 1;
+    // Identifies the protocol version of the bot.
+    string protocol_version = 2;
+    // Identify the bot's team side (Team_Home or Team_Away)
+    Team.Side team_side = 3;
+    // Player's number 1-11
+    uint32 number = 4;
+    // Position where the player must be set at "GetReady" state (at beginning of the match or after a goal)
+    Point init_position = 5;
+}
+
+// GameSnapshot stores all game elements data.
+message GameSnapshot {
+    enum State {
+        // The game is waiting for all players be connected. There is a configurable time limit to wait for players. After
+        // this limit expires, the match is considered over.
+        WAITING = 0;
+        // The game resets the players position to start the match or to restart the match after a goal.
+        GET_READY = 1;
+        // The game is waiting for players orders. There is a configurable time window for this phase. After the time
+        // limit expires, the server will ignore the missing orders and process the ones it got.
+        // (when running on dev mode, the server may allow different behaviours)
+        LISTENING = 2;
+        // The game is executing the players' orders in the same sequence they were gotten.
+        // If the ball is NOT been holden, its velocity will be processed first. Otherwise, it position will be updated
+        // when the ball holder movement be processed.
+        // If there is no movement orders from a player, but it has speed greater than 0, it will be processed after
+        // all its orders are processed.
+        // Each player orders will be processed in the same sequence they were included in the message (e.g. first move,
+        // than kick)
+        // The ball kick is processed immediately after the order (the ball position is updated as its new velocity
+        // after the kick)
+        PLAYING = 3;
+        // The game interrupt the match to shift the ball possession. It happens only when the shot time is over (see
+        // shot_clock property). The ball will be given to the goalkeeper of the defense team, and the next state will
+        // "listening", so the bots will not have time to rearrange before the next turn.
+        SHIFTING = 4;
+        // The game may be over after any phase.
+        // It can be over after Waiting if there is no players connected after the time limit for connections
+        // It can be over after GetReady or Listening if there is no enough players (e.g. connection lost)
+        // And it also can be over after Playing state if that was the last turn of the match.
+        OVER = 99;
+    }
+    // The game state defines which phase the game is. The phase determine what the server is doing, are going to do, or
+    // what it is waiting for.
+    State state = 1;
+    // Turns counter. It starts from 1, but before the match starts, it may be zero.
+    uint32 turn = 2;
+    // Store the home team elements.
+    Team home_team = 3;
+    // Store the away team elements.
+    Team away_team = 4;
+    // Store the ball element.
+    Ball ball = 5;
+    // number of turns the ball is in a goal zone
+    uint32 turns_ball_in_goal_zone = 6;
+    // Store the shot clock to control ball possession limit
+    ShotClock shot_clock = 7;
+}
+
+// Stores all team elements and data.
+message Team {
+    // List of player in the team
+    repeated Player players = 1;
+    // Team name
+    string name = 2;
+    // Team score in the present turn
+    uint32 score = 3;
+    enum Side {
+        // Team playing on the left side of field
+        HOME = 0;
+        // Team playing on the right side of the field
+        AWAY = 1;
+    }
+    // Side which the team is playing on.
+    Side side = 4;
+}
+
+// Stores the side of the team in attack and the time remaining holding the ball.
+// The team side is changed as soon a bot of the defense team catch the ball.
+message ShotClock {
+    // Team side of the team in attack.
+    Team.Side team_side = 6;
+    // Remaining turns the attack team may hold the ball
+    uint32 remaining_turns = 7;
+}
+
+// Stores all player attributes
+message Player {
+    // Number of this player in its team (1-11)
+    uint32 number = 1;
+    // Current player position
+    Point position = 2;
+    // Current player velocity
+    Velocity velocity = 3;
+    // Team side which its playing in (it's used to speed up some readings since the player element will be in a list
+    // of players of a team)
+    Team.Side team_side = 4;
+    // Default position when it's position is reset
+    Point init_position = 5;
+    // indicates the the player is jumping (goalkeepers only)
+    bool is_jumping = 6;
+}
+
+// Stores all ball attributes
+message Ball {
+    // Current position
+    Point position = 1;
+    // Current velocity. It will be the exactly same velocity as the ball holder when a player is holding it.
+    Velocity velocity = 2;
+    // Player that is currently holding the ball. Null if the ball is not holden.
+    Player holder = 3;
+}
+
+// Message sent to the player as a response after sending a order set to the the server.
+message OrderResponse {
+    enum StatusCode {
+        SUCCESS = 0;
+        UNKNOWN_PLAYER = 1;
+        NOT_LISTENING = 2;
+        WRONG_TURN = 3;
+        OTHER = 99;
+    }
+    // Define if the order will be correctly processed.
+    StatusCode code = 1;
+    // String message used for debugging proposes.
+    string details = 2;
+}
+
+// Message containing the orders the player want to send to the server in that turn.
+message OrderSet {
+    // Turn which this order set should be processed at.
+    uint32 turn = 1;
+    // List of orders in the expected order of execution
+    repeated Order orders = 2;
+    // String message used for debugging proposes.
+    string debug_message = 3;
+}
+
+// Order to the game server. To be sent by players during the Listening phase.
+message Order {
+    oneof action {
+        Move move = 1;
+        Catch catch = 2;
+        Kick kick = 3;
+        Jump jump = 4;
+    }
+}
+
+// Order to ask the server to change the player velocity (direction and speed).
+// This order replaces the current player velocity, and the new velocity attribute will be immediately processed
+// in that turn. There is a limit speed to the player. The server will cap the velocity if the request is higher than
+// the limit.
+message Move {
+    // The nex Velocity
+    Velocity velocity = 1;
+}
+
+// Order to try to catch the ball. The player can only catch the ball when the player is touching the ball.
+// Only one catching order can be executed in a turn. So, if more than one player try to catch the ball in the same
+// turn, the first processed catch order will succeed, and the next ones will fail.
+message Catch {
+
+}
+
+// The kick order is only executed by the ball holder, and it is processed immediately.
+// Important: The kick velocity is summed to the current ball velocity.
+// The kick speed will suffer a power reduction proportionally to the player direction when the kick is not in the
+// same direction of the player direction. The reduction is calculated based on the angle with the player direction
+// using the formula `SpeedReducerFactor = 0.5 + (0.5 * ((180 - ang) / 180))`
+// In summary, the speed will by reduced proportionally to the angle from 100% at 0 degrees until the limit of
+// 50% at 180 degrees.
+message Kick {
+    // Kick velocity (it won't be necessarily the final ball velocity)
+    Velocity velocity = 1;
+}
+
+// Changes the goalkeepers velocity in a higher speed.
+// The goalkeepers may move kicker than other players when they jump, however the jump movement cannot be interrupted
+// after triggered. (read specs to find out the number of turns the jump lasts)
+message Jump {
+    // Goalkeeper's velocity during the jump.
+    Velocity velocity = 1;
+}

@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+import "physics.proto";
+import "server.proto";
+
+package lugo;
+
+option go_package  = "github.com/lugobots/lugo4go/proto";
+
+// The game server implements a Remote service that allows you to control the game flow.
+// This service may help you to control or watch the game during training sessions.
+// The game server only offers this service on debug mode on.
+service Remote {
+    rpc PauseOrResume (PauseResumeRequest) returns (CommandResponse);
+    rpc NextTurn (NextTurnRequest) returns (CommandResponse);
+    rpc NextOrder (NextOrderRequest) returns (CommandResponse);
+    rpc SetBallProperties (BallProperties) returns (CommandResponse);
+    rpc SetPlayerProperties (PlayerProperties) returns (CommandResponse);
+    rpc SetGameProperties (GameProperties) returns (CommandResponse);
+    rpc ResumeListeningPhase (ResumeListeningRequest) returns (ResumeListeningResponse);
+    rpc ResetPlayerPositions (ResetPlayerPositionsRequest) returns (ResetPlayerPositionsResponse);
+    rpc GetGameSnapshot (GameSnapshotRequest) returns (GameSnapshotResponse);
+}
+
+message PauseResumeRequest {
+}
+message NextTurnRequest {
+}
+message NextOrderRequest {
+}
+
+message BallProperties {
+    Point position = 1;
+    Velocity velocity = 2;
+    Player holder = 3;
+}
+
+message PlayerProperties {
+    Team.Side side = 1;
+    uint32 number = 2;
+    Point position = 3;
+    Velocity velocity = 4;
+}
+
+message GameProperties {
+    uint32 turn = 1;
+    uint32 home_score = 2;
+    uint32 away_score = 3;
+    int64 frame_interval = 4;
+    ShotClock shot_clock = 5;
+}
+
+message CommandResponse {
+    enum StatusCode {
+        SUCCESS = 0;
+        INVALID_VALUE = 1;
+        DEADLINE_EXCEEDED = 2;
+        OTHER = 99;
+    }
+    StatusCode code = 1;
+    GameSnapshot game_snapshot = 2;
+    string details = 3;
+}
+
+
+message ResumeListeningRequest{}
+message ResumeListeningResponse{}
+
+message ResetPlayerPositionsRequest{}
+message ResetPlayerPositionsResponse{
+    GameSnapshot game_snapshot = 1;
+}
+
+message GameSnapshotRequest{}
+message GameSnapshotResponse{
+    GameSnapshot game_snapshot = 1;
+}
