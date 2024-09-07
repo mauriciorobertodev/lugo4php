@@ -4,7 +4,7 @@
     "version": "0.0.1-dev",
     "license": "MIT",
     "autoload": {
-          "psr-4": {
+        "psr-4": {
             "Lugo4php\\": "src/"
         },
         "classmap": [

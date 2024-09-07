@@ -5,6 +5,7 @@ namespace Lugo4php;
 
 use Lugo4php\Interfaces\IBot;
 use Grpc\ChannelCredentials;
+use Lugo4php\Interfaces\IClient;
 use Lugo\GameClient;
 use Lugo\GameSnapshot;
 use Lugo\GameSnapshot_State;
@@ -44,9 +45,9 @@ class Client implements IClient {
         $req = new JoinRequest();
         $req->setToken($this->token);
         $req->setProtocolVersion(PROTOCOL_VERSION);
-        $req->setSide($this->side->value);
+        $req->setTeamSide($this->side->value);
         $req->setNumber($this->number);
-        $req->setInitPosition($this->initPosition);
+        $req->setInitPosition($this->initPosition->toLugoPoint());
 
         $running = $this->client->joinATeam($req);
 

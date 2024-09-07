@@ -50,4 +50,9 @@ class Velocity implements IVelocity
 			$lugoVelocity->getSpeed()
 		);
 	}
+
+	public static function newZeroed(): Velocity
+	{
+		return new Velocity(new Point(), 0);
+	}
 }

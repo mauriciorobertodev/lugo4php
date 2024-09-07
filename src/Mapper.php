@@ -16,20 +16,30 @@ class Mapper implements IMapper {
         private Side $side
     ) {
         if ($cols < 4) {
-            throw new \Exception("number of cols lower the minimum");
+            throw new \RuntimeException("Número de colunas abaixo do mínimo permitido");
         }
         if ($cols > 200) {
-            throw new \Exception("number of cols higher the maximum");
+            throw new \RuntimeException("Número de colunas acima do máximo permitido");
         }
         if ($rows < 2) {
-            throw new \Exception("number of rows lower the minimum");
+            throw new \RuntimeException("Número de linhas abaixo do mínimo permitido");
         }
         if ($rows > 100) {
-            throw new \Exception("number of rows higher the maximum");
+            throw new \RuntimeException("Número de linhas acima do máximo permitido");
         }
 
         $this->regionWidth = SPECS::MAX_X_COORDINATE / $cols;
         $this->regionHeight = SPECS::MAX_Y_COORDINATE / $rows;
+    }
+
+    public function getCols(): int
+    {
+        return $this->cols;
+    }
+
+    public function getRows(): int
+    {
+        return $this->rows;
     }
 
     public function getRegion(int $col, int $row): Region {

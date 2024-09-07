@@ -7,6 +7,10 @@ use Lugo\GameSnapshot;
 use Lugo\Order;
 use Lugo4php\Interfaces\IGameInspector;
 use Lugo4php\Side;
+use Lugo\Jump;
+use Lugo\Kick;
+use Lugo\Move;
+use Lugo\CatchOrder;
 
 class GameInspector implements IGameInspector {
     private int $myNumber;
@@ -109,43 +113,153 @@ class GameInspector implements IGameInspector {
         return $this->mySide === Side::AWAY ? Goal::AWAY() : Goal::HOME();
     }
 
-    public function makeOrderMove($target, $speed): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderMove(Point $target, float $speed): Order
+    {
+        return $this->makeOrderMoveFromPoint($this->me->getPosition() ?? new Point(), $target, $speed);
     }
 
-    public function makeOrderMoveMaxSpeed($target): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderMoveMaxSpeed(Point $target): Order
+    {
+        return $this->makeOrderMoveFromPoint($this->me->getPosition() ?? new Point(), $target, SPECS::PLAYER_MAX_SPEED);
     }
 
-    public function makeOrderMoveFromPoint($origin, $target, $speed): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderMoveFromPoint(Point $origin, Point $target, float $speed): Order {
+        if (abs(getDistanceBetween($origin, $target)) > 0) {
+            $direction = getDirectionTo($origin, $target);
+        }
+
+        $vel = Velocity::newZeroed();
+        $vel->setDirection($direction);
+        $vel->setSpeed($speed);
+
+        $moveOrder = new Move();
+        $moveOrder->setVelocity($vel->toLugoVelocity());
+
+        return (new Order())->setMove($moveOrder);
     }
 
-    public function makeOrderMoveFromVector($direction, $speed): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderMoveFromVector(Point $direction, float $speed): Order
+    {
+        $origin = $this->me->getPosition() ?? new Point();
+        $targetPoint = targetFrom($direction, $origin);
+        return $this->makeOrderMoveFromPoint($origin, $targetPoint, $speed);
     }
 
-    public function makeOrderMoveByDirection($direction, $speed = null): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderMoveByDirection(Direction $direction, ?float $speed = null): Order
+    {
+        $directionTarget = $this->getOrientationByDirection($direction);
+        return $this->makeOrderMoveFromVector($directionTarget, $speed ?? SPECS::PLAYER_MAX_SPEED);
     }
 
-    public function makeOrderMoveToStop(): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderMoveToStop(): Order
+    {
+        $myDirection = $this->getMe()->getVelocity()->getDirection() ?? $this->getOrientationByDirection(Direction::FORWARD);
+        return $this->makeOrderMoveFromVector($myDirection, 0);
     }
 
-    public function makeOrderJump($target, $speed): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderJump(Point $target, float $speed): Order
+    {
+        $origin = $this->me->getPosition() ?? new Point();
+        $direction = getDirectionTo($origin, $target);
+        $vel = Velocity::newZeroed();
+        $vel->setDirection($direction);
+        $vel->setSpeed($speed);
+
+        $jump = new Jump();
+        $jump->setVelocity($vel);
+
+        return (new Order())->setJump($jump);
     }
 
-    public function makeOrderKick($target, $speed): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderKick(Point $target, float $speed): Order
+    {
+        $ballPosition = $this->getBall()?->getPosition() ?? new Point();
+        $ballVelocity = $this->getBall()?->getVelocity()?->getDirection() ?? new Point();
+        $ballExpectedDirection = getDirectionTo($ballPosition, $target);
+
+        $vel = Velocity::newZeroed();
+        $vel->setDirection($ballExpectedDirection);
+        $vel->setSpeed($speed);
+
+        $kick = new Kick();
+        $kick->setVelocity($vel);
+
+        return (new Order())->setKick($kick);
     }
 
-    public function makeOrderKickMaxSpeed($target): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderKickMaxSpeed(Point $target): Order
+    {
+        return $this->makeOrderKick($target, SPECS::BALL_MAX_SPEED);
     }
 
-    public function makeOrderCatch(): Order {
-        throw new \RuntimeException('Method not implemented');
+    public function makeOrderCatch(): Order
+    {
+        return (new Order())->setCatch(new CatchOrder());
+    }
+
+    public function getOrientationByDirection(Direction $direction): Point
+    {
+        switch ($direction) {
+            case Direction::FORWARD:
+                $directionTarget = Orientation::EAST();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::WEST();
+                }
+                break;
+
+            case Direction::BACKWARD:
+                $directionTarget = Orientation::WEST();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::EAST();
+                }
+                break;
+
+            case Direction::LEFT:
+                $directionTarget = Orientation::NORTH();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::SOUTH();
+                }
+                break;
+
+            case Direction::RIGHT:
+                $directionTarget = Orientation::SOUTH();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::NORTH();
+                }
+                break;
+
+            case Direction::BACKWARD_LEFT:
+                $directionTarget = Orientation::NORTH_WEST();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::SOUTH_EAST();
+                }
+                break;
+
+            case Direction::BACKWARD_RIGHT:
+                $directionTarget = Orientation::SOUTH_WEST();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::NORTH_EAST();
+                }
+                break;
+
+            case Direction::FORWARD_LEFT:
+                $directionTarget = Orientation::NORTH_EAST();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::SOUTH_WEST();
+                }
+                break;
+
+            case Direction::FORWARD_RIGHT:
+                $directionTarget = Orientation::SOUTH_EAST();
+                if ($this->mySide === Side::AWAY) {
+                    $directionTarget = Orientation::NORTH_WEST();
+                }
+                break;
+
+            default:
+                throw new \Exception("Unknown direction {$direction}");
+        }
+
+        return $directionTarget;
     }
 }

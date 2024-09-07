@@ -1,17 +1,23 @@
 <?php
 
-require 'vendor/autoload.php';
+require 'example/bot/vendor/autoload.php';
+require 'settings.php';
 
 use Example\Bot\BotTester;
 use Lugo4php\Client;
 use Lugo4php\Env;
+use Lugo4php\Formation;
 use Lugo4php\Mapper;
 
 $env = new Env();
 
-$mapper = new Mapper(10, 6, $env->getBotSide());
+$mapper = new Mapper(MAPPER_COLS, MAPPER_ROWS, $env->getBotSide());
 
-$initPosition = $mapper->getRegion(1, 4)->getCenter();
+$formation = Formation::createFromArray(PLAYER_INITIAL_POSITIONS);
+
+$initRegion = $formation->getPositionOf($env->getBotNumber());
+
+$initPosition = $mapper->getRegion($initRegion->getX(), $initRegion->getY())->getCenter();
 
 $bot = new BotTester(
 	$env->getBotNumber(),

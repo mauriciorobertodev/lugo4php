@@ -17,8 +17,8 @@ class Env implements IEnv {
     public function __construct() {
         $this->grpcUrl = $_ENV['BOT_GRPC_URL'] ?? 'localhost:5000';
         $this->grpcInsecure = filter_var($_ENV['BOT_GRPC_INSECURE'] ?? 'true', FILTER_VALIDATE_BOOLEAN);
-        $this->botSide = Side::fromString(strtolower($_ENV['BOT_TEAM'] ?? 'home'));
-        $this->botNumber = $this->validateBotNumber($_ENV['BOT_NUMBER'] ?? '10');
+        $this->botSide = Side::fromString(strtolower($_ENV['BOT_TEAM'] ?? ''));
+        $this->botNumber = $this->validateBotNumber($_ENV['BOT_NUMBER'] ?? '');
         $this->botToken = $_ENV['BOT_TOKEN'] ?? '';
     }
 

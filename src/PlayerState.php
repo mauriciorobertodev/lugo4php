@@ -14,7 +14,7 @@ enum PlayerState: string {
             'holding' => self::HOLDING,
             'defending' => self::DEFENDING,
             'disputing' => self::DISPUTING,
-            default => throw new \InvalidArgumentException("Invalid team side value: '{$value}'"),
+            default => throw new \RuntimeException("Valor '{$value}' inválido para estado do player"),
         };
     }
 }

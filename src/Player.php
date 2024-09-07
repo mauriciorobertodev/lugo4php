@@ -79,7 +79,7 @@ class Player implements IPlayer {
 		return new Player(
 			$lugoPlayer->getNumber(),
 			$lugoPlayer->getIsJumping(),
-			Side::from($lugoPlayer->getSide()),
+			Side::from($lugoPlayer->getTeamSide()),
 			Point::fromLugoPoint($lugoPlayer->getPosition()),
 			Point::fromLugoPoint($lugoPlayer->getInitPosition()),
 			Velocity::fromLugoVelocity($lugoPlayer->getVelocity())

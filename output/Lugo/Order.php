@@ -60,7 +60,7 @@ class Order extends \Google\Protobuf\Internal\Message
      */
     public function setCatch($var)
     {
-        GPBUtil::checkMessage($var, \Lugo\Catch::class);
+        GPBUtil::checkMessage($var, \Lugo\CatchOrder::class);
         $this->writeOneof(2, $var);
 
         return $this;

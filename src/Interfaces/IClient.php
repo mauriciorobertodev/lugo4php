@@ -1,6 +1,6 @@
 <?php
 
-namespace Lugo4php;
+namespace Lugo4php\Interfaces;
 
 use Lugo4php\Interfaces\IBot;
 
