@@ -7,8 +7,11 @@
         "psr-4": {
             "Lugo4php\\": "src/"
         },
+        "classmap": [
+            "output/Lugo/",
+            "output/GPBMetadata/"
+        ],
         "files": [
-            "src/lugo-autoload.php",
             "src/helpers.php"
         ]
     },
