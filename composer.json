@@ -1,7 +1,7 @@
 {
     "name": "mrdev/lugo4php",
     "description": "Cliente PHP para Lugo Bots",
-    "version": "0.0.1-dev",
+    "version": "0.0.2-dev",
     "license": "MIT",
     "autoload": {
         "psr-4": {
