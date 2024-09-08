@@ -17,12 +17,12 @@ use Google\Protobuf\Internal\GPBUtil;
  * In summary, the speed will by reduced proportionally to the angle from 100% at 0 degrees until the limit of
  * 50% at 180 degrees.
  *
- * Generated from protobuf message <code>lugo.Kick</code>
+ * Generated from protobuf message <code>lugo.KickOrder</code>
  */
-class Kick extends \Google\Protobuf\Internal\Message
+class KickOrder extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Kick velocity (it won't be necessarily the final ball velocity)
+     * KickOrder velocity (it won't be necessarily the final ball velocity)
      *
      * Generated from protobuf field <code>.lugo.Velocity velocity = 1;</code>
      */
@@ -34,7 +34,7 @@ class Kick extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Kick velocity (it won't be necessarily the final ball velocity)
+     * KickOrder velocity (it won't be necessarily the final ball velocity)
      *
      * Generated from protobuf field <code>.lugo.Velocity velocity = 1;</code>
      * @return \Lugo\Velocity
@@ -45,7 +45,7 @@ class Kick extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Kick velocity (it won't be necessarily the final ball velocity)
+     * KickOrder velocity (it won't be necessarily the final ball velocity)
      *
      * Generated from protobuf field <code>.lugo.Velocity velocity = 1;</code>
      * @param \Lugo\Velocity $var

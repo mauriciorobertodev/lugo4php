@@ -7,9 +7,9 @@ use Lugo\GameSnapshot;
 use Lugo\Order;
 use Lugo4php\Interfaces\IGameInspector;
 use Lugo4php\Side;
-use Lugo\Jump;
-use Lugo\Kick;
-use Lugo\Move;
+use Lugo\JumpOrder;
+use Lugo\KickOrder;
+use Lugo\MoveOrder;
 use Lugo\CatchOrder;
 
 class GameInspector implements IGameInspector {
@@ -26,7 +26,7 @@ class GameInspector implements IGameInspector {
         $me = $this->getPlayer($this->mySide, $this->myNumber);
 
         if (!$me) {
-            throw new \RuntimeException("Não foi possível encontrar o jogador {$botSide}-{$playerNumber}");
+            throw new \RuntimeException("Não foi possível encontrar o jogador {$botSide->toString()}-{$playerNumber}");
         }
 
         $this->me = $me;
@@ -110,7 +110,7 @@ class GameInspector implements IGameInspector {
     }
 
     public function getAttackGoal(): Goal {
-        return $this->mySide === Side::AWAY ? Goal::AWAY() : Goal::HOME();
+        return $this->mySide === Side::HOME ? Goal::AWAY() : Goal::HOME();
     }
 
     public function makeOrderMove(Point $target, float $speed): Order
@@ -124,6 +124,7 @@ class GameInspector implements IGameInspector {
     }
 
     public function makeOrderMoveFromPoint(Point $origin, Point $target, float $speed): Order {
+        $direction = normalize(new Point(1, 1));
         if (abs(getDistanceBetween($origin, $target)) > 0) {
             $direction = getDirectionTo($origin, $target);
         }
@@ -132,7 +133,7 @@ class GameInspector implements IGameInspector {
         $vel->setDirection($direction);
         $vel->setSpeed($speed);
 
-        $moveOrder = new Move();
+        $moveOrder = new MoveOrder();
         $moveOrder->setVelocity($vel->toLugoVelocity());
 
         return (new Order())->setMove($moveOrder);
@@ -165,8 +166,8 @@ class GameInspector implements IGameInspector {
         $vel->setDirection($direction);
         $vel->setSpeed($speed);
 
-        $jump = new Jump();
-        $jump->setVelocity($vel);
+        $jump = new JumpOrder();
+        $jump->setVelocity($vel->toLugoVelocity());
 
         return (new Order())->setJump($jump);
     }
@@ -181,8 +182,8 @@ class GameInspector implements IGameInspector {
         $vel->setDirection($ballExpectedDirection);
         $vel->setSpeed($speed);
 
-        $kick = new Kick();
-        $kick->setVelocity($vel);
+        $kick = new KickOrder();
+        $kick->setVelocity($vel->toLugoVelocity());
 
         return (new Order())->setKick($kick);
     }

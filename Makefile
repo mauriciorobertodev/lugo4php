@@ -1,17 +1,18 @@
-PROTO_DIR=src/protos
+PROTO_DIR=/protos
 OUTPUT_DIR=output
-# PROTO_FILE=/protos/server.proto
-# PROTO_FILE=/protos/broadcast.proto
-PROTO_FILE=/protos/physics.proto
-# PROTO_FILE=/protos/remote.proto
+PROTO_FILES=$(PROTO_DIR)/server.proto $(PROTO_DIR)/broadcast.proto $(PROTO_DIR)/physics.proto $(PROTO_DIR)/remote.proto
 
-generate-proto:
-	docker run --rm -v $(PWD)/$(PROTO_DIR):/protos -v $(PWD)/$(OUTPUT_DIR):/output znly/protoc \
+generate:
+	docker run --rm -v $(PWD)/$(PROTO_DIR):/protos -v $(PWD)/$(OUTPUT_DIR):/output \
+		znly/protoc \
 		-I/protos \
 		--php_out=/output \
 		--grpc_out=/output \
 		--plugin=protoc-gen-grpc=/usr/bin/grpc_php_plugin \
-		$(PROTO_FILE)
+		$(PROTO_FILES) && sudo chmod -R 777 $(PWD)/$(OUTPUT_DIR)
+
+update-output:
+	sudo chmod 777 -R output
 	
 delete-output:
 	sudo rm -rf $(OUTPUT_DIR)

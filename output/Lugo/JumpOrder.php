@@ -9,17 +9,16 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Order to ask the server to change the player velocity (direction and speed).
- * This order replaces the current player velocity, and the new velocity attribute will be immediately processed
- * in that turn. There is a limit speed to the player. The server will cap the velocity if the request is higher than
- * the limit.
+ * Changes the goalkeepers velocity in a higher speed.
+ * The goalkeepers may move kicker than other players when they jump, however the jump movement cannot be interrupted
+ * after triggered. (read specs to find out the number of turns the jump lasts)
  *
- * Generated from protobuf message <code>lugo.Move</code>
+ * Generated from protobuf message <code>lugo.JumpOrder</code>
  */
-class Move extends \Google\Protobuf\Internal\Message
+class JumpOrder extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The nex Velocity
+     * Goalkeeper's velocity during the jump.
      *
      * Generated from protobuf field <code>.lugo.Velocity velocity = 1;</code>
      */
@@ -31,7 +30,7 @@ class Move extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The nex Velocity
+     * Goalkeeper's velocity during the jump.
      *
      * Generated from protobuf field <code>.lugo.Velocity velocity = 1;</code>
      * @return \Lugo\Velocity
@@ -42,7 +41,7 @@ class Move extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The nex Velocity
+     * Goalkeeper's velocity during the jump.
      *
      * Generated from protobuf field <code>.lugo.Velocity velocity = 1;</code>
      * @param \Lugo\Velocity $var

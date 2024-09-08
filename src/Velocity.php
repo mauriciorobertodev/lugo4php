@@ -46,7 +46,7 @@ class Velocity implements IVelocity
 	public static function fromLugoVelocity(LugoVelocity $lugoVelocity): Velocity
 	{
 		return new Velocity(
-			Point::fromLugoVector($lugoVelocity->getDirection()),
+			normalize(Point::fromLugoVector($lugoVelocity->getDirection())),
 			$lugoVelocity->getSpeed()
 		);
 	}

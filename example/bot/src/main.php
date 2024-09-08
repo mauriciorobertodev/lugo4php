@@ -1,6 +1,7 @@
 <?php
 
 require 'example/bot/vendor/autoload.php';
+// require 'vendor/autoload.php';
 require 'settings.php';
 
 use Example\Bot\BotTester;

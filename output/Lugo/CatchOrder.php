@@ -13,7 +13,7 @@ use Google\Protobuf\Internal\GPBUtil;
  * Only one catching order can be executed in a turn. So, if more than one player try to catch the ball in the same
  * turn, the first processed catch order will succeed, and the next ones will fail.
  *
- * Generated from protobuf message <code>lugo.Catch</code>
+ * Generated from protobuf message <code>lugo.CatchOrder</code>
  */
 class CatchOrder extends \Google\Protobuf\Internal\Message
 {

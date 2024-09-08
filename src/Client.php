@@ -13,6 +13,9 @@ use Lugo\JoinRequest;
 use Lugo\OrderSet;
 use Lugo4php\PlayerState;
 use Lugo4php\Side;
+use Lugo\Move;
+use Lugo\Order;
+use Lugo\OrderResponse_StatusCode;
 
 const PROTOCOL_VERSION = "1.0.0";
 
@@ -86,7 +89,7 @@ class Client implements IClient {
              * O jogo executa as ordens dos jogadores na mesma sequência em que foram recebidas.
              */
             if($response->getState() === GameSnapshot_State::PLAYING) {
-                // 
+                //
             }
             
             /**
@@ -127,8 +130,35 @@ class Client implements IClient {
         }
 
         $orderSet = new OrderSet();
+        $orderSet->setTurn($inspector->getTurn());
         $orderSet->setOrders($orders);
-        $this->client->SendOrders($orderSet);
+
+        $call = $this->client->SendOrders($orderSet);
+
+        list($response, $status) = $call->wait();
+
+        // $statusCode = $response->getCode();
+
+        // switch ($statusCode) {
+        //     case \Lugo\OrderResponse_StatusCode::SUCCESS:
+        //         echo "Ordem enviada com sucesso!";
+        //         break;
+        //     case \Lugo\OrderResponse_StatusCode::UNKNOWN_PLAYER:
+        //         echo "Jogador desconhecido.";
+        //         break;
+        //     case \Lugo\OrderResponse_StatusCode::NOT_LISTENING:
+        //         echo "Servidor não está ouvindo.";
+        //         break;
+        //     case \Lugo\OrderResponse_StatusCode::WRONG_TURN:
+        //         echo "Ordem enviada no turno errado. Verifique a sequência de turnos.";
+        //         break;
+        //     case \Lugo\OrderResponse_StatusCode::OTHER:
+        //         echo "Erro desconhecido.";
+        //         break;
+        //     default:
+        //         echo "Status não reconhecido: " . $statusCode;
+        //         break;
+        // }
     }
 
     private function definePlayerState(GameInspector $inspector): PlayerState

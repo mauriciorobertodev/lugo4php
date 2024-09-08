@@ -23,8 +23,8 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Move move = 1;</code>
-     * @return \Lugo\Move
+     * Generated from protobuf field <code>.lugo.MoveOrder move = 1;</code>
+     * @return \Lugo\MoveOrder
      */
     public function getMove()
     {
@@ -32,21 +32,21 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Move move = 1;</code>
-     * @param \Lugo\Move $var
+     * Generated from protobuf field <code>.lugo.MoveOrder move = 1;</code>
+     * @param \Lugo\MoveOrder $var
      * @return $this
      */
     public function setMove($var)
     {
-        GPBUtil::checkMessage($var, \Lugo\Move::class);
+        GPBUtil::checkMessage($var, \Lugo\MoveOrder::class);
         $this->writeOneof(1, $var);
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Catch catch = 2;</code>
-     * @return \Lugo\Catch
+     * Generated from protobuf field <code>.lugo.CatchOrder catch = 2;</code>
+     * @return \Lugo\CatchOrder
      */
     public function getCatch()
     {
@@ -54,8 +54,8 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Catch catch = 2;</code>
-     * @param \Lugo\Catch $var
+     * Generated from protobuf field <code>.lugo.CatchOrder catch = 2;</code>
+     * @param \Lugo\CatchOrder $var
      * @return $this
      */
     public function setCatch($var)
@@ -67,8 +67,8 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Kick kick = 3;</code>
-     * @return \Lugo\Kick
+     * Generated from protobuf field <code>.lugo.KickOrder kick = 3;</code>
+     * @return \Lugo\KickOrder
      */
     public function getKick()
     {
@@ -76,21 +76,21 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Kick kick = 3;</code>
-     * @param \Lugo\Kick $var
+     * Generated from protobuf field <code>.lugo.KickOrder kick = 3;</code>
+     * @param \Lugo\KickOrder $var
      * @return $this
      */
     public function setKick($var)
     {
-        GPBUtil::checkMessage($var, \Lugo\Kick::class);
+        GPBUtil::checkMessage($var, \Lugo\KickOrder::class);
         $this->writeOneof(3, $var);
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Jump jump = 4;</code>
-     * @return \Lugo\Jump
+     * Generated from protobuf field <code>.lugo.JumpOrder jump = 4;</code>
+     * @return \Lugo\JumpOrder
      */
     public function getJump()
     {
@@ -98,13 +98,13 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.lugo.Jump jump = 4;</code>
-     * @param \Lugo\Jump $var
+     * Generated from protobuf field <code>.lugo.JumpOrder jump = 4;</code>
+     * @param \Lugo\JumpOrder $var
      * @return $this
      */
     public function setJump($var)
     {
-        GPBUtil::checkMessage($var, \Lugo\Jump::class);
+        GPBUtil::checkMessage($var, \Lugo\JumpOrder::class);
         $this->writeOneof(4, $var);
 
         return $this;

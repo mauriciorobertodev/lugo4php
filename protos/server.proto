@@ -160,10 +160,10 @@ message OrderSet {
 // Order to the game server. To be sent by players during the Listening phase.
 message Order {
     oneof action {
-        Move move = 1;
-        Catch catch = 2;
-        Kick kick = 3;
-        Jump jump = 4;
+        MoveOrder move = 1;
+        CatchOrder catch = 2;
+        KickOrder kick = 3;
+        JumpOrder jump = 4;
     }
 }
 
@@ -171,7 +171,7 @@ message Order {
 // This order replaces the current player velocity, and the new velocity attribute will be immediately processed
 // in that turn. There is a limit speed to the player. The server will cap the velocity if the request is higher than
 // the limit.
-message Move {
+message MoveOrder {
     // The nex Velocity
     Velocity velocity = 1;
 }
@@ -179,7 +179,7 @@ message Move {
 // Order to try to catch the ball. The player can only catch the ball when the player is touching the ball.
 // Only one catching order can be executed in a turn. So, if more than one player try to catch the ball in the same
 // turn, the first processed catch order will succeed, and the next ones will fail.
-message Catch {
+message CatchOrder {
 
 }
 
@@ -190,15 +190,15 @@ message Catch {
 // using the formula `SpeedReducerFactor = 0.5 + (0.5 * ((180 - ang) / 180))`
 // In summary, the speed will by reduced proportionally to the angle from 100% at 0 degrees until the limit of
 // 50% at 180 degrees.
-message Kick {
-    // Kick velocity (it won't be necessarily the final ball velocity)
+message KickOrder {
+    // KickOrder velocity (it won't be necessarily the final ball velocity)
     Velocity velocity = 1;
 }
 
 // Changes the goalkeepers velocity in a higher speed.
 // The goalkeepers may move kicker than other players when they jump, however the jump movement cannot be interrupted
 // after triggered. (read specs to find out the number of turns the jump lasts)
-message Jump {
+message JumpOrder {
     // Goalkeeper's velocity during the jump.
     Velocity velocity = 1;
 }

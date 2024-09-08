@@ -2,9 +2,8 @@
 
 namespace Example\Bot;
 
-require 'settings.php';
-
 use Lugo4php\Direction;
+use Lugo4php\Formation;
 use Lugo4php\GameInspector;
 use Lugo4php\PlayerState;
 use Lugo4php\Side;
@@ -30,14 +29,31 @@ class BotTester implements IBot
 
 	public function onHolding(GameInspector $inspector): array
 	{
+
+			$orders = [];
+			$me = $inspector->getMe();
+
+			$attackGoalCenter = $inspector->getAttackGoal()->getCenter();
+			$opponentGoal = $this->mapper->getRegionFromPoint($attackGoalCenter);
+			$currentRegion = $this->mapper->getRegionFromPoint($me->getPosition());
+
+			$myOrder = null;
+
+			if ($this->isINear($currentRegion, $opponentGoal)) {
+				$myOrder = $inspector->makeOrderKickMaxSpeed($attackGoalCenter);
+			} else {
+				$myOrder = $inspector->makeOrderMoveMaxSpeed($attackGoalCenter);
+			}
+
+			$orders[] = $myOrder;
+			return $orders;
 		
-		return [];
+
 	}
 
 	public function onDisputing(GameInspector $inspector): array
 	{
-		return [$inspector->makeOrderCatch()];
-		try {
+
             $orders = [];
             $me = $inspector->getMe();
             $ballPosition = $inspector->getBall()->getPosition();
@@ -65,25 +81,65 @@ class BotTester implements IBot
             $orders[] = $catchOrder;
 
             return $orders;
-        } catch (\Exception $e) {
-            error_log("Did not play this turn: " . $e->getMessage());
-			return [];
-        }
+
 	}
 
 	public function onDefending(GameInspector $inspector): array
 	{
-		return [$inspector->makeOrderCatch()];
+
+			$orders = [];
+			$me = $inspector->getMe();
+			$ballPosition = $inspector->getBall()->getPosition();
+			$ballRegion = $this->mapper->getRegionFromPoint($ballPosition);
+			$myRegion = $this->mapper->getRegionFromPoint($me->getPosition());
+
+			// Por padrão, vou ficar na minha posição tática
+			$moveDestination = $this->getMyExpectedPosition($inspector, $this->mapper, $this->number);
+
+			// Se a bola estiver no máximo 2 blocos de distância de mim, vou em direção à bola
+			if ($this->isINear($myRegion, $ballRegion)) {
+				$moveDestination = $ballPosition;
+			}
+
+			$moveOrder = $inspector->makeOrderMoveMaxSpeed($moveDestination);
+			$catchOrder = $inspector->makeOrderCatch();
+
+			$orders[] = $moveOrder;
+			$orders[] = $catchOrder;
+
+			return $orders;
+
 	}
 
 	public function onSupporting(GameInspector $inspector): array
 	{
-		return [$inspector->makeOrderCatch()];
+
+			$orders = [];
+			$me = $inspector->getMe();
+			$ballHolderPosition = $inspector->getBall()->getPosition();
+			$myOrder = $inspector->makeOrderMoveMaxSpeed($ballHolderPosition);
+
+			$orders[] = $myOrder;
+			return $orders;
+
 	}
 	
 	public function asGoalkeeper(GameInspector $inspector, PlayerState $state): array
 	{
-		return [$inspector->makeOrderCatch()];
+			$orders = [];
+			$me = $inspector->getMe();
+			$position = $inspector->getBall()->getPosition();
+
+			if ($state !== PlayerState::DISPUTING) {
+				$position = $inspector->getDefenseGoal()->getCenter();
+			}
+
+			$myOrder = $inspector->makeOrderMoveMaxSpeed($position);
+
+			$orders[] = $myOrder;
+			$orders[] = $inspector->makeOrderCatch();
+			
+			return $orders;
 	}
 
 	public function getMyExpectedPosition(GameInspector $reader, Mapper $mapper, int $myNumber): Point
@@ -93,15 +149,16 @@ class BotTester implements IBot
         $fieldThird = $this->mapper->getCols() / 3;
         $ballCols = $ballRegion->getCol();
 
-		$tacticPositions = OFFENSIVE;
+		$tacticPositions = Formation::createFromArray(OFFENSIVE);
         if ($ballCols < $fieldThird) {
-			$tacticPositions = DEFENSIVE;
+			$tacticPositions = Formation::createFromArray(DEFENSIVE);
         } elseif ($ballCols < $fieldThird * 2) {
-			$tacticPositions = NORMAL;
+			$tacticPositions = Formation::createFromArray(NORMAL);
         }
-      
-        $position = $tacticPositions[$myNumber] ?? ['Col' => 0, 'Row' => 0];
-        $expectedRegion = $mapper->getRegion($position['Col'], $position['Row']);
+
+		$position = $tacticPositions->getPositionOf($this->number);
+    
+        $expectedRegion = $mapper->getRegion($position->getX(), $position->getY());
 
         return $expectedRegion->getCenter();
     }
