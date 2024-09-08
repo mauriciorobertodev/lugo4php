@@ -13,9 +13,6 @@ use Lugo\JoinRequest;
 use Lugo\OrderSet;
 use Lugo4php\PlayerState;
 use Lugo4php\Side;
-use Lugo\Move;
-use Lugo\Order;
-use Lugo\OrderResponse_StatusCode;
 
 const PROTOCOL_VERSION = "1.0.0";
 
