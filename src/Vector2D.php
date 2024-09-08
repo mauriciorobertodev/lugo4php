@@ -5,7 +5,7 @@ namespace Lugo4php;
 use Lugo4php\Interfaces\IPositionable;
 use Lugo4php\Traits\IsPositionable;
 
-class Point implements IPositionable
+class Vector2D implements IPositionable
 {
     use IsPositionable;
 

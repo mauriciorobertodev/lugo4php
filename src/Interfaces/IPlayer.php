@@ -17,6 +17,7 @@ interface IPlayer
     public function getSide(): Side;
     public function getInitPosition(): Point;
     public function getIsJumping(): bool;
+    public function isGoalkeeper(): bool;
     public function is(Player $player): bool;
     public function eq(Player $player): bool;
 }

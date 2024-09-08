@@ -61,6 +61,7 @@ class Client implements IClient {
              */
             if($response->getState() === GameSnapshot_State::GET_READY) {
                 $inspector = new GameInspector($this->side, $this->number, $response);
+                $bot->inspector = $inspector;
                 $bot->onReady($inspector);
             }
             
@@ -79,6 +80,7 @@ class Client implements IClient {
              */
             if($response->getState() === GameSnapshot_State::LISTENING) {
                 $inspector = new GameInspector($this->side, $this->number, $response);
+                $bot->inspector = $inspector;
                 $this->onListening($inspector, $bot);
             }
             
@@ -108,17 +110,17 @@ class Client implements IClient {
     }
 
     private function onListening(GameInspector $inspector, IBot $bot) : void {
-        $playerState = $this->definePlayerState($inspector);
-        $isGoalkeeper = $bot->number === SPECS::GOALKEEPER_NUMBER;
+        $PlayerState = $inspector->getMyState();
+        $isGoalkeeper = $inspector->getMe()->isGoalkeeper();
 
         $orders = [];
 
         if($isGoalkeeper) {
-            $orders = $bot->asGoalkeeper($inspector, $playerState);
+            $orders = $bot->asGoalkeeper($inspector, $PlayerState);
         }
 
         if(!$isGoalkeeper) {
-            $orders = match ($playerState) {
+            $orders = match ($PlayerState) {
                  PlayerState::DEFENDING => $bot->onDefending($inspector),
                  PlayerState::HOLDING => $bot->onHolding($inspector),
                  PlayerState::DISPUTING => $bot->onDisputing($inspector),
@@ -156,30 +158,5 @@ class Client implements IClient {
         //         echo "Status não reconhecido: " . $statusCode;
         //         break;
         // }
-    }
-
-    private function definePlayerState(GameInspector $inspector): PlayerState
-    {
-        if (!$inspector->getBall()) {
-            throw new \RuntimeException('Estado de snapshot inválido - não é possível definir o estado do jogador.');
-        }
-
-        if (!$inspector->getPlayer($this->side, $this->number)) {
-            throw new \RuntimeException('Não foi possível encontrar o bot no snapshot - não é possível definir o estado do jogador.');
-        }
-
-        $ballHolder = $inspector->getBall()->getHolder();
-        if (!$ballHolder) {
-            return PlayerState::DISPUTING;
-        } 
-        
-        if($ballHolder->getSide() === $this->side) {
-            if ($ballHolder->getNumber() === $this->number) {
-                return PlayerState::HOLDING;
-            }
-            return PlayerState::SUPPORTING;
-        }
-
-        return PlayerState::DEFENDING;
     }
 }

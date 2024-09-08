@@ -1,6 +1,7 @@
 <?php
 namespace Lugo4php;
 
+use Lugo4php\Interfaces\IPositionable;
 use Lugo4php\Interfaces\IRegion;
 use Lugo4php\Side;
 use Lugo4php\Mapper;
@@ -49,6 +50,21 @@ class Region implements IRegion {
 
     public function right(): Region {
         return $this->mapper->getRegion($this->col, max($this->row - 1, 0));
+    }
+
+    public function coordinates(): Point
+    {
+        return new Point($this->col, $this->row);
+    }
+
+    public function distanceToRegion(IRegion $region): float
+    {
+        return $this->coordinates()->distanceTo($region->coordinates());
+    }
+
+    public function distanceToPoint(IPositionable $point): float 
+    {
+        return $this->getCenter()->distanceTo($point);
     }
 
     public function __toString(): string {

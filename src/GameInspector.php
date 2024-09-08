@@ -6,6 +6,8 @@ use Exception;
 use Lugo\GameSnapshot;
 use Lugo\Order;
 use Lugo4php\Interfaces\IGameInspector;
+use Lugo4php\Interfaces\IPositionable;
+use Lugo4php\Interfaces\IRegion;
 use Lugo4php\Side;
 use Lugo\JumpOrder;
 use Lugo\KickOrder;
@@ -13,23 +15,21 @@ use Lugo\MoveOrder;
 use Lugo\CatchOrder;
 
 class GameInspector implements IGameInspector {
-    private int $myNumber;
     private Player $me;
-    private Side $mySide;
     private GameSnapshot $snapshot;
+    private PlayerState $myState;
 
     public function __construct(Side $botSide, int $playerNumber, GameSnapshot $gameSnapshot) {
-        $this->mySide = $botSide;
-        $this->myNumber = $playerNumber;
         $this->snapshot = $gameSnapshot;
 
-        $me = $this->getPlayer($this->mySide, $this->myNumber);
+        $me = $this->getPlayer($botSide, $playerNumber);
 
         if (!$me) {
             throw new \RuntimeException("Não foi possível encontrar o jogador {$botSide->toString()}-{$playerNumber}");
         }
 
         $this->me = $me;
+        $this->myState = $this->definePlayerState();
     }
 
     public function getSnapshot(): GameSnapshot {
@@ -42,6 +42,51 @@ class GameInspector implements IGameInspector {
 
     public function getMe(): Player {
         return $this->me;
+    }
+
+    public function getMyState(): PlayerState {
+        return $this->myState;
+    }
+
+    public function getMyTeam(): ?Team {
+        return $this->getTeam($this->getMySide());
+    }
+
+    public function getMyNumber(): int {
+        return $this->getMe()->getNumber();
+    }
+
+    public function getMySide(): Side {
+        return $this->getMe()->getSide();
+    }
+
+    public function getMyPosition(): IPositionable
+    {
+        return $this->getMe()->getPosition();
+    }
+
+    public function getMyDirection(): IPositionable
+    {
+        return $this->getMe()->getDirection();
+    }
+
+    public function getMySpeed(): float
+    {
+        return $this->getMe()->getSpeed();
+    }
+
+    public function getMyVelocity(): Velocity
+    {
+        return $this->getMe()->getVelocity();
+    }
+
+    /** @return Player[] */
+    public function getMyPlayers(): array {
+        return $this->getMyTeam()?->getPlayers() ?? [];
+    }
+
+    public function getMyGoalkeeper(): ?Player {
+        return $this->getPlayer($this->getMySide(), SPECS::GOALKEEPER_NUMBER);
     }
 
     public function getBall(): ?Ball {
@@ -71,25 +116,12 @@ class GameInspector implements IGameInspector {
         return $this->snapshot->getAwayTeam() ? Team::fromLugoTeam($this->snapshot->getAwayTeam()) : null;
     }
 
-    public function getMyTeam(): ?Team {
-        return $this->getTeam($this->mySide);
-    }
-
     public function getOpponentTeam(): ?Team {
         return $this->getTeam($this->getOpponentSide());
     }
 
-    public function getMySide(): Side {
-        return $this->mySide;
-    }
-
     public function getOpponentSide(): Side {
-        return $this->mySide === Side::HOME ? Side::AWAY : Side::HOME;
-    }
-
-    /** @return Player[] */
-    public function getMyPlayers(): array {
-        return $this->getMyTeam()?->getPlayers() ?? [];
+        return $this->getMySide() === Side::HOME ? Side::AWAY : Side::HOME;
     }
 
     /** @return Player[] */
@@ -97,38 +129,39 @@ class GameInspector implements IGameInspector {
         return $this->getOpponentTeam()?->getPlayers() ?? [];
     }
 
-    public function getMyTeamGoalkeeper(): ?Player {
-        return $this->getPlayer($this->getMySide(), SPECS::GOALKEEPER_NUMBER);
-    }
-
     public function getOpponentGoalkeeper(): ?Player {
         return $this->getPlayer($this->getOpponentSide(), SPECS::GOALKEEPER_NUMBER);
     }
 
     public function getDefenseGoal(): Goal {
-        return $this->mySide === Side::HOME ? Goal::HOME() : Goal::AWAY();
+        return $this->getMySide() === Side::HOME ? Goal::HOME() : Goal::AWAY();
     }
 
     public function getAttackGoal(): Goal {
-        return $this->mySide === Side::HOME ? Goal::AWAY() : Goal::HOME();
+        return $this->getMySide() === Side::HOME ? Goal::AWAY() : Goal::HOME();
     }
 
-    public function makeOrderMove(Point $target, float $speed): Order
-    {
-        return $this->makeOrderMoveFromPoint($this->me->getPosition() ?? new Point(), $target, $speed);
-    }
+    public function makeOrderMoveToTarget(IPositionable $target, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        $direction = (new Point(1, 1))->normalize();
+        $origin = $this->getMe()->getPosition();
 
-    public function makeOrderMoveMaxSpeed(Point $target): Order
-    {
-        return $this->makeOrderMoveFromPoint($this->me->getPosition() ?? new Point(), $target, SPECS::PLAYER_MAX_SPEED);
-    }
-
-    public function makeOrderMoveFromPoint(Point $origin, Point $target, float $speed): Order {
-        $direction = normalize(new Point(1, 1));
-        if (abs(getDistanceBetween($origin, $target)) > 0) {
-            $direction = getDirectionTo($origin, $target);
+        if ($origin->distanceTo($target) > 0) {
+            $direction = $origin->directionTo($target);
         }
 
+        return $this->makeOrderMoveToDirection($direction, $speed);
+    }
+
+    public function makeOrderMoveToPoint(Point $point, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        return $this->makeOrderMoveToTarget($point, $speed);
+    }
+
+    public function makeOrderMoveToVector(Vector2D $vector, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        return $this->makeOrderMoveToTarget($vector, $speed);
+    }
+
+    public function makeOrderMoveToDirection(IPositionable $direction, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order
+    {
         $vel = Velocity::newZeroed();
         $vel->setDirection($direction);
         $vel->setSpeed($speed);
@@ -139,29 +172,22 @@ class GameInspector implements IGameInspector {
         return (new Order())->setMove($moveOrder);
     }
 
-    public function makeOrderMoveFromVector(Point $direction, float $speed): Order
-    {
-        $origin = $this->me->getPosition() ?? new Point();
-        $targetPoint = targetFrom($direction, $origin);
-        return $this->makeOrderMoveFromPoint($origin, $targetPoint, $speed);
-    }
-
-    public function makeOrderMoveByDirection(Direction $direction, ?float $speed = null): Order
-    {
-        $directionTarget = $this->getOrientationByDirection($direction);
-        return $this->makeOrderMoveFromVector($directionTarget, $speed ?? SPECS::PLAYER_MAX_SPEED);
+    public function makeOrderMoveToRegion(IRegion $region, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        $direction = $this->getMe()->getPosition()->directionTo($region->getCenter());
+        return $this->makeOrderMoveToDirection($direction, $speed);
     }
 
     public function makeOrderMoveToStop(): Order
     {
-        $myDirection = $this->getMe()->getVelocity()->getDirection() ?? $this->getOrientationByDirection(Direction::FORWARD);
-        return $this->makeOrderMoveFromVector($myDirection, 0);
+        $direction = $this->getMe()->getVelocity()->getDirection();
+        return $this->makeOrderMoveToDirection($direction, 0);
     }
 
-    public function makeOrderJump(Point $target, float $speed): Order
+    public function makeOrderJump(IPositionable $target, ?float $speed = SPECS::GOALKEEPER_JUMP_MAX_SPEED): Order
     {
-        $origin = $this->me->getPosition() ?? new Point();
-        $direction = getDirectionTo($origin, $target);
+        $origin = $this->getMe()->getPosition() ?? new Point();
+        $direction = $origin->directionTo($target);
+
         $vel = Velocity::newZeroed();
         $vel->setDirection($direction);
         $vel->setSpeed($speed);
@@ -172,14 +198,13 @@ class GameInspector implements IGameInspector {
         return (new Order())->setJump($jump);
     }
 
-    public function makeOrderKick(Point $target, float $speed): Order
+    public function makeOrderKick(IPositionable $target, ?float $speed = SPECS::BALL_MAX_SPEED): Order
     {
         $ballPosition = $this->getBall()?->getPosition() ?? new Point();
-        $ballVelocity = $this->getBall()?->getVelocity()?->getDirection() ?? new Point();
-        $ballExpectedDirection = getDirectionTo($ballPosition, $target);
+        $ballDirection = $ballPosition->directionTo($target);
 
         $vel = Velocity::newZeroed();
-        $vel->setDirection($ballExpectedDirection);
+        $vel->setDirection($ballDirection);
         $vel->setSpeed($speed);
 
         $kick = new KickOrder();
@@ -188,7 +213,7 @@ class GameInspector implements IGameInspector {
         return (new Order())->setKick($kick);
     }
 
-    public function makeOrderKickMaxSpeed(Point $target): Order
+    public function makeOrderKickMaxSpeed(IPositionable $target): Order
     {
         return $this->makeOrderKick($target, SPECS::BALL_MAX_SPEED);
     }
@@ -198,69 +223,28 @@ class GameInspector implements IGameInspector {
         return (new Order())->setCatch(new CatchOrder());
     }
 
-    public function getOrientationByDirection(Direction $direction): Point
+    private function definePlayerState(): PlayerState
     {
-        switch ($direction) {
-            case Direction::FORWARD:
-                $directionTarget = Orientation::EAST();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::WEST();
-                }
-                break;
-
-            case Direction::BACKWARD:
-                $directionTarget = Orientation::WEST();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::EAST();
-                }
-                break;
-
-            case Direction::LEFT:
-                $directionTarget = Orientation::NORTH();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::SOUTH();
-                }
-                break;
-
-            case Direction::RIGHT:
-                $directionTarget = Orientation::SOUTH();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::NORTH();
-                }
-                break;
-
-            case Direction::BACKWARD_LEFT:
-                $directionTarget = Orientation::NORTH_WEST();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::SOUTH_EAST();
-                }
-                break;
-
-            case Direction::BACKWARD_RIGHT:
-                $directionTarget = Orientation::SOUTH_WEST();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::NORTH_EAST();
-                }
-                break;
-
-            case Direction::FORWARD_LEFT:
-                $directionTarget = Orientation::NORTH_EAST();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::SOUTH_WEST();
-                }
-                break;
-
-            case Direction::FORWARD_RIGHT:
-                $directionTarget = Orientation::SOUTH_EAST();
-                if ($this->mySide === Side::AWAY) {
-                    $directionTarget = Orientation::NORTH_WEST();
-                }
-                break;
-
-            default:
-                throw new \Exception("Unknown direction {$direction}");
+        if (!$this->getBall()) {
+            throw new \RuntimeException('Estado de snapshot inválido - não é possível definir o estado do jogador.');
         }
 
-        return $directionTarget;
+        if (!$this->getPlayer($this->getMySide(), $this->getMyNumber())) {
+            throw new \RuntimeException('Não foi possível encontrar o bot no snapshot - não é possível definir o estado do jogador.');
+        }
+
+        $ballHolder = $this->getBall()->getHolder();
+        if (!$ballHolder) {
+            return PlayerState::DISPUTING;
+        } 
+        
+        if($ballHolder->getSide() === $this->getMySide()) {
+            if ($ballHolder->getNumber() === $this->getMyNumber()) {
+                return PlayerState::HOLDING;
+            }
+            return PlayerState::SUPPORTING;
+        }
+
+        return PlayerState::DEFENDING;
     }
 }

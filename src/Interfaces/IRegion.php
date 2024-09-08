@@ -13,5 +13,8 @@ interface IRegion {
     public function back(): IRegion;
     public function left(): IRegion;
     public function right(): IRegion;
+    public function coordinates(): IPositionable;
+    public function distanceToRegion(IRegion $region): float;
+    public function distanceToPoint(IPositionable $point): float;
 	public function __toString(): string;
 }

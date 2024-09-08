@@ -3,6 +3,9 @@
     "description": "Cliente PHP para Lugo Bots",
     "version": "0.0.2-dev",
     "license": "MIT",
+    "scripts": {
+        "test": "./vendor/bin/pest"
+    },
     "autoload": {
         "psr-4": {
             "Lugo4php\\": "src/"
@@ -25,5 +28,13 @@
         "google/protobuf": "^4.28",
         "grpc/grpc": "^1.57",
         "php": "^8.3.11"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.35"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }

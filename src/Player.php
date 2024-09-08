@@ -54,6 +54,11 @@ class Player implements IPlayer {
 		return $this->isJumping;
 	}
 
+	public function isGoalkeeper(): bool
+	{
+		return $this->getNumber() === SPECS::GOALKEEPER_NUMBER;
+	}
+
 	public function is(Player $player): bool
 	{
 		return $this->eq($player);
