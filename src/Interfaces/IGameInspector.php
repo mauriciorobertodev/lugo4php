@@ -45,6 +45,7 @@ interface IGameInspector {
     public function makeOrderMoveToStop(): Order;
     public function makeOrderJump(IPositionable $target, ?float $speed): Order;
     public function makeOrderKick(IPositionable $target, ?float $speed): Order;
+    public function makeOrderKickToPlayer(Player $player, ?float $speed): Order;
     public function makeOrderKickMaxSpeed(IPositionable $target): Order;
     public function makeOrderCatch(): Order;
 }

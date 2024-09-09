@@ -100,7 +100,7 @@
             "dist": {
                 "type": "path",
                 "url": "../..",
-                "reference": "83a7d19ef3899c98c9ee1707cc7abc3c18250ac6"
+                "reference": "0e713f63c24eb48c46bc5fb12560a72d642caf13"
             },
             "require": {
                 "google/protobuf": "^4.28",

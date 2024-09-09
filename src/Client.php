@@ -104,7 +104,7 @@ class Client implements IClient {
              * O jogo pode terminar após qualquer fase.
              */
             if($response->getState() === GameSnapshot_State::OVER) {
-                // 
+                $running = $this->client->joinATeam($req);
             }
         }
     }

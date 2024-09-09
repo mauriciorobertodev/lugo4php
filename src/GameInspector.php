@@ -213,6 +213,10 @@ class GameInspector implements IGameInspector {
         return (new Order())->setKick($kick);
     }
 
+    public function makeOrderKickToPlayer(Player $player, ?float $speed = SPECS::BALL_MAX_SPEED): Order {
+        return $this->makeOrderKick($player->getPosition(), $speed);
+    }
+
     public function makeOrderKickMaxSpeed(IPositionable $target): Order
     {
         return $this->makeOrderKick($target, SPECS::BALL_MAX_SPEED);

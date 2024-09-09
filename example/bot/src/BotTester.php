@@ -2,7 +2,6 @@
 
 namespace Example\Bot;
 
-use Lugo4php\Direction;
 use Lugo4php\Formation;
 use Lugo4php\GameInspector;
 use Lugo4php\PlayerState;
@@ -58,10 +57,8 @@ class BotTester implements IBot
 		$ballRegion = $this->mapper->getRegionFromPoint($ballPosition);
 		$myRegion = $this->mapper->getRegionFromPoint($me->getPosition());
 
-		// By default, I will stay at my tactic position
 		$moveDestination = $this->getMyExpectedPosition($inspector, $this->mapper, $this->number);
 
-		// If the ball is max 2 blocks away from me, I will move toward the ball
 		if ($myRegion->distanceToRegion($ballRegion) <= 2) {
 			$moveDestination = $ballPosition;
 		}

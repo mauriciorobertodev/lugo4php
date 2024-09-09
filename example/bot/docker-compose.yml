@@ -1,7 +1,7 @@
 services:
   game_server:
     image: lugobots/server:${SERVER_VERSION:-latest}
-    command: play --dev-mode --listening-duration=${LISTENING_DURATION:-50ms} --grpc-port=${GAME_GRPC_PORT:-5000} --timer-mode=${TIMER_MODE:-wait}
+    command: play --dev-mode --listening-duration=${LISTENING_DURATION:-50ms} --grpc-port=${GAME_GRPC_PORT:-5000} --timer-mode=${TIMER_MODE:-wait} --quiet
     ports:
       - "${GAME_GRPC_PORT:-5000}:${GAME_GRPC_PORT:-5000}"
       - "8080:8080"
@@ -27,6 +27,12 @@ services:
       - BOT_NUMBER=1
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_02:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -40,6 +46,12 @@ services:
       - BOT_NUMBER=2
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_03:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -53,6 +65,12 @@ services:
       - BOT_NUMBER=3
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_04:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -66,6 +84,12 @@ services:
       - BOT_NUMBER=4
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_05:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -79,6 +103,12 @@ services:
       - BOT_NUMBER=5
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_06:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -92,6 +122,12 @@ services:
       - BOT_NUMBER=6
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_07:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -105,6 +141,12 @@ services:
       - BOT_NUMBER=7
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_08:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -118,6 +160,12 @@ services:
       - BOT_NUMBER=8
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_09:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -131,6 +179,12 @@ services:
       - BOT_NUMBER=9
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_10:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -144,6 +198,12 @@ services:
       - BOT_NUMBER=10
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_home_11:
     image: mauricioroberto/php-grpc-base:8.3.11
     working_dir: /app
@@ -157,6 +217,12 @@ services:
       - BOT_NUMBER=11
       - BOT_TEAM=${PLAYER_SIDE:-home}
       - BOT_GRPC_URL=game_server:${GAME_GRPC_PORT:-5000}
+      - BOT_LOG_ON=${BOT_LOG_ON:-false}
+      - LOG_ON_DISPUTING=${LOG_ON_DISPUTING:-false}
+      - LOG_ON_DEFENDING=${LOG_ON_DEFENDING:-false}
+      - LOG_ON_HOLDING=${LOG_ON_HOLDING:-false}
+      - LOG_ON_SUPPORTING=${LOG_ON_SUPPORTING:-false}
+      - LOG_GOALKEEPER=${LOG_GOALKEEPER:-false}
   player_away_01:
     image: ${AWAY_BOT:-lugobots/level-1:latest}
     environment:
