@@ -2,8 +2,8 @@
 
 namespace Lugo4php\Interfaces;
 
-use Lugo4php\Side;
 use Lugo4php\Point;
+use Lugo4php\Side;
 
 interface IGoal {
     public function getCenter(): Point;

@@ -1,11 +1,12 @@
 <?php
-namespace Lugo4php\Interfaces;
 
+namespace Lugo4php\Interfaces;
 
 use Lugo4php\GameInspector;
 use Lugo4php\PlayerState;
 
 interface IBot {
+    public function beforeAction(GameInspector $inspector): void;
     public function onReady(GameInspector $inspector): void;
 
     public function onHolding(GameInspector $inspector): array;

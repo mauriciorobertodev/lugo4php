@@ -6,7 +6,7 @@ use Lugo4php\GameInspector;
 use Lugo4php\PlayerState;
 
 trait HasLog {
-	public GameInspector $inspector;
+	protected GameInspector $inspector;
 
 	public function log(string $text): void {
 		if(!$this->canLog()) return;
@@ -35,7 +35,7 @@ trait HasLog {
 	}
 
 	private function canLog(): bool {
-		if (!getenv('BOT_LOG_ON') || getenv('BOT_LOG_ON') !== "true") {
+		if (getenv('BOT_LOG_ON') !== "true") {
 			return false;
 		}
 

@@ -37,6 +37,16 @@ class Ball implements IBall
 		return $this;
 	}
 
+	public function getDirection(): Vector2D
+	{
+		return $this->getVelocity()->getDirection();
+	}
+
+	public function getSped(): float
+	{
+		return $this->getVelocity()->getSpeed();
+	}
+
     public function hasHolder(): bool
 	{
 		return (bool) $this->holder;

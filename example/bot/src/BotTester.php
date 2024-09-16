@@ -2,50 +2,23 @@
 
 namespace Example\Bot;
 
+use Lugo4php\DefaultBotBase;
 use Lugo4php\Formation;
 use Lugo4php\GameInspector;
 use Lugo4php\PlayerState;
 use Lugo4php\Side;
-use Lugo4php\Interfaces\IBot;
 use Lugo4php\Interfaces\IMapper;
-use Lugo4php\Traits\HasLog;
 use Lugo4php\Mapper;
 use Lugo4php\Point;
 
-class BotTester implements IBot 
+class BotTester extends DefaultBotBase
 {
-	use HasLog;
-
 	public function __construct(
 		public int $number,
 		public Side $side,
 		public Point $initPosition,
 		public IMapper $mapper,
 	) {}
-
-	public function onReady(GameInspector $inspector): void
-	{
-		// 
-	}
-
-	public function onHolding(GameInspector $inspector): array
-	{
-		$this->log('onHolding');
-		$orders = [];
-		$me = $inspector->getMe();
-
-		$attackGoalCenter = $inspector->getAttackGoal()->getCenter();
-		$opponentGoalRegion = $this->mapper->getRegionFromPoint($attackGoalCenter);
-		$currentRegion = $this->mapper->getRegionFromPoint($me->getPosition());
-
-		if ($currentRegion->distanceToRegion($opponentGoalRegion) <= 2) {
-			$orders[] = $inspector->makeOrderKick($attackGoalCenter);
-		} else {
-			$orders[] = $inspector->makeOrderMoveToTarget($attackGoalCenter);
-		}
-
-		return $orders;
-	}
 
 	public function onDisputing(GameInspector $inspector): array
 	{
@@ -69,6 +42,25 @@ class BotTester implements IBot
 
 		$orders[] = $moveOrder;
 		$orders[] = $catchOrder;
+
+		return $orders;
+	}
+
+	public function onHolding(GameInspector $inspector): array
+	{
+		$this->log('onHolding');
+		$orders = [];
+		$me = $inspector->getMe();
+
+		$attackGoalCenter = $inspector->getAttackGoal()->getCenter();
+		$opponentGoalRegion = $this->mapper->getRegionFromPoint($attackGoalCenter);
+		$currentRegion = $this->mapper->getRegionFromPoint($me->getPosition());
+
+		if ($currentRegion->distanceToRegion($opponentGoalRegion) <= 2) {
+			$orders[] = $inspector->makeOrderKick($attackGoalCenter);
+		} else {
+			$orders[] = $inspector->makeOrderMoveToTarget($attackGoalCenter);
+		}
 
 		return $orders;
 	}
@@ -112,6 +104,7 @@ class BotTester implements IBot
 	public function asGoalkeeper(GameInspector $inspector, PlayerState $state): array
 	{
 		$this->log('asGoalkeeper');
+		
 		$orders = [];
 		$position = $inspector->getBall()->getPosition();
 

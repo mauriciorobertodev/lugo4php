@@ -1,7 +1,7 @@
 <?php
+
 namespace Lugo4php;
 
-use Lugo4php\Interfaces\IPositionable;
 use Lugo4php\Interfaces\IRegion;
 use Lugo4php\Side;
 use Lugo4php\Mapper;
@@ -21,7 +21,7 @@ class Region implements IRegion {
     }
 
     public function eq(IRegion $region): bool {
-        return $region->getCol() === $this->col && $region->side === $this->side && $region->getRow() === $this->row;
+        return $region->getCol() === $this->col && $region->getRow() === $this->row;
     }
 
     public function getCol(): int {
@@ -31,17 +31,33 @@ class Region implements IRegion {
     public function getRow(): int {
         return $this->row;
     }
-
+    
     public function getCenter(): Point {
         return $this->center;
     }
 
+    public function frontRight(): Region {
+        return $this->front()->right();
+    }
+    
     public function front(): Region {
         return $this->mapper->getRegion(max($this->col + 1, 0), $this->row);
     }
 
+    public function frontLeft(): Region {
+        return $this->front()->left();
+    }
+
+    public function backRight(): Region {
+        return $this->back()->right();
+    }
+    
     public function back(): Region {
         return $this->mapper->getRegion(max($this->col - 1, 0), $this->row);
+    }
+
+    public function backLeft(): Region {
+        return $this->back()->left();
     }
 
     public function left(): Region {
@@ -62,9 +78,14 @@ class Region implements IRegion {
         return $this->coordinates()->distanceTo($region->coordinates());
     }
 
-    public function distanceToPoint(IPositionable $point): float 
+    public function distanceToPoint(Point $point): float 
     {
         return $this->getCenter()->distanceTo($point);
+    }
+
+    public function containsPlayer(Player $player): bool
+    {
+        return $this->mapper->getRegionFromPoint($player->getPosition())->is($this);
     }
 
     public function __toString(): string {

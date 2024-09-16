@@ -13,6 +13,7 @@ use Lugo\JoinRequest;
 use Lugo\OrderSet;
 use Lugo4php\PlayerState;
 use Lugo4php\Side;
+use Lugo\BroadcastClient;
 
 const PROTOCOL_VERSION = "1.0.0";
 
@@ -53,6 +54,7 @@ class Client implements IClient {
 
         $responses = $running->responses();
 
+        /** @var GameSnapshot $response */
         foreach ($responses as $response) {
             if (!$response instanceof GameSnapshot) continue;
 
@@ -61,8 +63,9 @@ class Client implements IClient {
              */
             if($response->getState() === GameSnapshot_State::GET_READY) {
                 $inspector = new GameInspector($this->side, $this->number, $response);
-                $bot->inspector = $inspector;
                 $bot->onReady($inspector);
+
+                
             }
             
             /**
@@ -80,7 +83,6 @@ class Client implements IClient {
              */
             if($response->getState() === GameSnapshot_State::LISTENING) {
                 $inspector = new GameInspector($this->side, $this->number, $response);
-                $bot->inspector = $inspector;
                 $this->onListening($inspector, $bot);
             }
             
@@ -104,23 +106,23 @@ class Client implements IClient {
              * O jogo pode terminar após qualquer fase.
              */
             if($response->getState() === GameSnapshot_State::OVER) {
-                $running = $this->client->joinATeam($req);
+                // $running = $this->client->joinATeam($req);
             }
         }
     }
 
     private function onListening(GameInspector $inspector, IBot $bot) : void {
-        $PlayerState = $inspector->getMyState();
+        $bot->beforeAction($inspector);
+
+        $playerState = $inspector->getMyState();
         $isGoalkeeper = $inspector->getMe()->isGoalkeeper();
 
         $orders = [];
 
         if($isGoalkeeper) {
-            $orders = $bot->asGoalkeeper($inspector, $PlayerState);
-        }
-
-        if(!$isGoalkeeper) {
-            $orders = match ($PlayerState) {
+            $orders = $bot->asGoalkeeper($inspector, $playerState);
+        } else {
+            $orders = match ($playerState) {
                  PlayerState::DEFENDING => $bot->onDefending($inspector),
                  PlayerState::HOLDING => $bot->onHolding($inspector),
                  PlayerState::DISPUTING => $bot->onDisputing($inspector),

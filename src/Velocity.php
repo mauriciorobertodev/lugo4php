@@ -6,14 +6,14 @@ use Lugo4php\Interfaces\IVelocity;
 
 class Velocity implements IVelocity
 {
-	public function __construct(private Point $direction, private float $speed) {}
+	public function __construct(private Vector2D $direction, private float $speed) {}
 
-	public function getDirection(): Point
+	public function getDirection(): Vector2D
 	{
 		return $this->direction;
 	}
 
-    public function setDirection(Point $direction): self
+    public function setDirection(Vector2D $direction): self
 	{
 		$this->direction = $direction;
 		return $this;

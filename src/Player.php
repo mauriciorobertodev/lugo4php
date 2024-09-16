@@ -25,7 +25,7 @@ class Player implements IPlayer {
 		return $this->velocity->getSpeed();
 	}
 
-    public function getDirection(): Point
+    public function getDirection(): Vector2D
 	{
 		return $this->velocity->getDirection();
 	}

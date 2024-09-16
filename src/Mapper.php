@@ -1,8 +1,10 @@
 <?php
 namespace Lugo4php;
 
+use InvalidArgumentException;
 use Lugo4php\Side;
 use Lugo4php\Interfaces\IMapper;
+use Lugo4php\Interfaces\IRegion;
 use Lugo4php\Point;
 use Lugo4php\SPECS;
 
@@ -37,12 +39,41 @@ class Mapper implements IMapper {
         return $this->cols;
     }
 
+    public function setCols(int $cols): self
+    {
+        $this->cols = $cols;
+        return $this;
+    }
+
     public function getRows(): int
     {
         return $this->rows;
     }
 
+    public function setRows(int $rows): self
+    {
+        $this->rows = $rows;
+        return $this;
+    }
+
+    public function getSide(): Side
+    {
+        return $this->side;
+    }
+    
     public function getRegion(int $col, int $row): Region {
+        if($col < 0 || $row < 0) {
+            throw new InvalidArgumentException(sprintf("As regiões do campo partem do 0x0", $this->cols));
+        }
+
+        if($col > $this->cols) {
+            throw new InvalidArgumentException(sprintf("O campo foi mapeado até %s colunas", $this->cols));
+        }
+        
+        if($row > $this->rows) {
+            throw new InvalidArgumentException(sprintf("O campo foi mapeado até %s linhas", $this->rows));
+        }
+
         $col = max(0, min($this->cols - 1, $col));
         $row = max(0, min($this->rows - 1, $row));
 
@@ -55,6 +86,16 @@ class Mapper implements IMapper {
         }
 
         return new Region($col, $row, $this->side, $center, $this);
+    }
+    
+    public function getRegionWidth(): int
+    {
+        return $this->regionWidth;
+    }
+
+    public function getRegionHeight(): int
+    {
+        return $this->regionHeight;
     }
 
     public function getRegionFromPoint(Point $point): Region {
@@ -69,6 +110,11 @@ class Mapper implements IMapper {
         $row = min($cy, $this->rows - 1);
 
         return $this->getRegion($col, $row);
+    }
+
+    public function getRandomRegion(): Region
+    {
+        return $this->getRegion(rand(0, $this->cols),rand(0, $this->rows));
     }
 
     private function mirrorCoordsToAway(Point $center): Point {
