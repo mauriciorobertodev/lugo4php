@@ -52,6 +52,8 @@ interface IPositionable {
 	public function toLugoVector(): LugoVector;
 
 	public function __toString(): string;
+	public function toVector2D(): Vector2D;
+	public function toPoint(): Point;
 
 	public static function fromLugoPoint(LugoPoint $lugoPoint): IPositionable;
 	public static function fromLugoVector(LugoVector $lugoVector): IPositionable;

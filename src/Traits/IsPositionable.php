@@ -1,7 +1,10 @@
 <?php
+
 namespace Lugo4php\Traits;
 
 use Lugo4php\Interfaces\IPositionable;
+use Lugo4php\Point;
+use Lugo4php\Vector2D;
 use Lugo\Point as LugoPoint;
 use Lugo\Vector as LugoVector;
 
@@ -13,29 +16,29 @@ trait IsPositionable {
         return $this->x;
     }
 
-    public function setX(float $x): IPositionable {
-        $this->x = $x;
+    public function setX(float $x): self {
+        $this->x = round($x, 10);
         return $this;
     }
 
-    public function addX(float $value): IPositionable {
-        $this->x += $value;
+    public function addX(float $value): self {
+       $this->setX($this->x + $value);
         return $this;
     }
 
-    public function subtractX(float $value): IPositionable {
-        $this->x -= $value;
+    public function subtractX(float $value): self {
+        $this->setX($this->x - $value);
         return $this;
     }
 
-    public function scaleX(float $value): IPositionable {
-        $this->x *= $value;
+    public function scaleX(float $value): self {
+        $this->setX($this->x * $value);
         return $this;
     }
 
-    public function divideX(float $value): IPositionable {
+    public function divideX(float $value): self {
         if ($value !== 0) {
-            $this->x /= $value;
+            $this->setX($this->x / $value);
         }
         return $this;
     }
@@ -44,38 +47,38 @@ trait IsPositionable {
         return $this->y;
     }
 
-    public function setY(float $y): IPositionable {
-        $this->y = $y;
+    public function setY(float $y): self {
+        $this->y = round($y, 10);
         return $this;
     }
 
-    public function addY(float $value): IPositionable {
-        $this->y += $value;
+    public function addY(float $value): self {
+        $this->setY($this->y + $value);
         return $this;
     }
 
-    public function subtractY(float $value): IPositionable {
-        $this->y -= $value;
+    public function subtractY(float $value): self {
+        $this->setY($this->y - $value);
         return $this;
     }
 
-    public function scaleY(float $value): IPositionable {
-        $this->y *= $value;
+    public function scaleY(float $value): self {
+        $this->setY($this->y * $value);
         return $this;
     }
 
-    public function divideY(float $value): IPositionable {
+    public function divideY(float $value): self {
         if ($value !== 0) {
-            $this->y /= $value;
+            $this->setY($this->y / $value);
         }
         return $this;
     }
 
-    public function normalize(): IPositionable {
+    public function normalize(): self {
         $magnitude = $this->magnitude();
-        if ($magnitude !== 0) {
-            $this->x /= $magnitude;
-            $this->y /= $magnitude;
+        if ($magnitude > 0) {
+            $this->divideX($magnitude);
+            $this->divideY($magnitude);
         }
         return $this;
     }
@@ -84,7 +87,7 @@ trait IsPositionable {
         return $this->clone()->normalize();
     }
 
-    public function add(IPositionable | float $value): IPositionable {
+    public function add(IPositionable | float $value): self {
         if (is_float($value)) {
             $this->addX($value);
             $this->addY($value);
@@ -99,7 +102,7 @@ trait IsPositionable {
         return $this->clone()->add($value);
     }
 
-    public function subtract(IPositionable | float $value): IPositionable {
+    public function subtract(IPositionable | float $value): self {
         if (is_float($value)) {
             $this->subtractX($value);
             $this->subtractY($value);
@@ -114,7 +117,7 @@ trait IsPositionable {
         return $this->clone()->subtract($value);
     }
 
-    public function divide(IPositionable | float $value): IPositionable {
+    public function divide(IPositionable | float $value): self {
         if (is_float($value)) {
             $this->divideX($value);
             $this->divideY($value);
@@ -129,7 +132,7 @@ trait IsPositionable {
         return $this->clone()->divide($value);
     }
 
-    public function scale(IPositionable | float $value): IPositionable {
+    public function scale(IPositionable | float $value): self {
         if (is_float($value)) {
             $this->scaleX($value);
             $this->scaleY($value);
@@ -153,27 +156,28 @@ trait IsPositionable {
         return $clone;
     }
 
-    public function directionTo(IPositionable $to): IPositionable {
-        return $to->subtracted($this)->normalize();
+    public function directionTo(IPositionable $to): Vector2D {
+        return $to->subtracted($this)->normalize()->toVector2D();
     }
 
     public function distanceTo(IPositionable $to): float {
         return $to->subtracted($this)->magnitude();
     }
 
-    public function moveToDirection(IPositionable $direction, float $distance): IPositionable {
+    public function moveToDirection(Vector2D $direction, float $distance): self {
         return $this->add($direction->normalized()->scale($distance));
     }
 
-    public function movedToDirection(IPositionable $direction, float $distance): IPositionable {
+    public function movedToDirection(Vector2D $direction, float $distance): IPositionable {
         return $this->added($direction->normalized()->scale($distance));
     }
 
-    public function moveToPoint(IPositionable $point, float $distance): IPositionable {
+    public function moveToPoint(Point $point, float $distance): self 
+    {    
         return $this->moveToDirection($this->directionTo($point), $distance);
     }
 
-    public function movedToPoint(IPositionable $point, float $distance): IPositionable {
+    public function movedToPoint(Point $point, float $distance): IPositionable {
         return $this->movedToDirection($this->directionTo($point), $distance);
     }
 
@@ -186,14 +190,16 @@ trait IsPositionable {
     }
 
     public function __toString(): string {
-        return sprintf("(%f, %f)", $this->x, $this->y);
+        return sprintf("(%.2f, %.2f)", $this->x, $this->y);
     }
 
-    public static function fromLugoPoint(LugoPoint $lugoPoint): IPositionable {
-        return (new static())->setX($lugoPoint->getX())->setY($lugoPoint->getY());
+    public function toVector2D(): Vector2D
+    {
+        return new Vector2D($this->x, $this->y);
     }
-
-    public static function fromLugoVector(LugoVector $lugoVector): IPositionable {
-        return (new static())->setX($lugoVector->getX())->setY($lugoVector->getY());
+    
+    public function toPoint(): Point
+    {
+        return new Point($this->x, $this->y);
     }
 }

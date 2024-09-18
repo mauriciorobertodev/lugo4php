@@ -4,7 +4,8 @@
     "version": "0.0.2-dev",
     "license": "MIT",
     "scripts": {
-        "test": "./vendor/bin/pest"
+        "test": "./vendor/bin/pest",
+        "test:coverage": "./vendor/bin/pest --coverage"
     },
     "autoload": {
         "psr-4": {
@@ -16,6 +17,14 @@
         ],
         "files": [
             "src/helpers.php"
+        ]
+    },
+     "autoload-dev": {
+        "psr-4": { 
+            "Tests\\": "tests/" 
+        },
+        "files": [
+            "tests/helpers.php"
         ]
     },
     "authors": [
