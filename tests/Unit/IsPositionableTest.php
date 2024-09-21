@@ -347,5 +347,22 @@ test('DEVE retornar um clone em Point ou Vector', function () {
     expect($v)->toBeInstanceOf(Vector2D::class);
     expect($v->getX())->toEqual(555);
     expect($v->getY())->toEqual(222);
-    
+});
+
+test('DEVE se o positionable tem o mesmo X e Y de outro positionable', function () {
+    $pos = new Positionable(555, 222);
+    $p1 = new Point(555, 222);
+    $v1 = new Vector2D(555, 222);
+    $p2 = new Point(333, 333);
+    $v2 = new Vector2D(333, 333);
+
+    expect($pos->is($p1))->toBeTrue();
+    expect($pos->is($v1))->toBeTrue();
+    expect($pos->eq($p1))->toBeTrue();
+    expect($pos->eq($v1))->toBeTrue();
+
+    expect($pos->is($p2))->toBeFalse();
+    expect($pos->is($v2))->toBeFalse();
+    expect($pos->eq($p2))->toBeFalse();
+    expect($pos->eq($v2))->toBeFalse();
 });

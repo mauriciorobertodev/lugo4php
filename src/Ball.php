@@ -42,7 +42,7 @@ class Ball implements IBall
 		return $this->getVelocity()->getDirection();
 	}
 
-	public function getSped(): float
+	public function getSpeed(): float
 	{
 		return $this->getVelocity()->getSpeed();
 	}
@@ -61,12 +61,6 @@ class Ball implements IBall
 	{
 		if(!$this->holder) return false;
 		return $this->holder->getNumber() === $holder->getNumber() && $this->holder->getSide() === $holder->getSide();
-	}
-
-    public function setHolder(?Player $holder): self
-	{
-		$this->holder = $holder;
-		return $this;
 	}
 
 	public function toLugoBall(): LugoBall

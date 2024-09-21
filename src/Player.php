@@ -4,12 +4,13 @@ namespace Lugo4php;
 use Lugo\Player as LugoPlayer;
 use Lugo4php\Interfaces\IPlayer;
 use Lugo4php\Side;
+use Lugo\Team_Side;
 
 class Player implements IPlayer {
 	public function __construct(
 		private int $number,
 		private bool $isJumping,
-		private Side $Side,
+		private Side $side,
 		private Point $position,
 		private Point $initPosition,
 		private Velocity $velocity,
@@ -41,7 +42,7 @@ class Player implements IPlayer {
 	}
 
     public function getSide(): Side {
-		return $this->Side;
+		return $this->side;
 	}
 
     public function getInitPosition(): Point
@@ -66,7 +67,7 @@ class Player implements IPlayer {
 	
 	public function eq(Player $player): bool
 	{
-		return $this->Side === $player->getSide() && $this->number === $player->getNumber();
+		return $this->side === $player->getSide() && $this->number === $player->getNumber();
 	}
 
 	public function toLugoPlayer(): LugoPlayer
@@ -75,8 +76,9 @@ class Player implements IPlayer {
 		$player->setNumber($this->number);
 		$player->setIsJumping($this->isJumping);
 		$player->setPosition($this->position->toLugoPoint());
-		$player->setInitPosition($this->position->toLugoPoint());
+		$player->setInitPosition($this->initPosition->toLugoPoint());
 		$player->setVelocity($this->velocity->toLugoVelocity());
+		$player->setTeamSide($this->side === Side::HOME ? Team_Side::HOME : Team_Side::AWAY);
 		return $player;
 	}
 

@@ -41,7 +41,7 @@ class Region implements IRegion {
     }
     
     public function front(): Region {
-        return $this->mapper->getRegion(max($this->col + 1, 0), $this->row);
+        return $this->mapper->getRegion(min($this->col + 1, $this->mapper->getCols()), $this->row);
     }
 
     public function frontLeft(): Region {
@@ -61,11 +61,11 @@ class Region implements IRegion {
     }
 
     public function left(): Region {
-        return $this->mapper->getRegion($this->col, max($this->row + 1, 0));
-    }
-
-    public function right(): Region {
         return $this->mapper->getRegion($this->col, max($this->row - 1, 0));
+    }
+    
+    public function right(): Region {
+        return $this->mapper->getRegion($this->col, min($this->row + 1, $this->mapper->getRows()));
     }
 
     public function coordinates(): Point

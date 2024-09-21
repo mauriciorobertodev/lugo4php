@@ -16,6 +16,13 @@ use Lugo\Order;
 interface IGameInspector {
     public function getSnapshot(): ?GameSnapshot;
     public function getTurn(): int;
+    public function getBall(): ?Ball;
+    public function getPlayer(Side $side, int $number): ?Player;
+    public function getTeam(Side $side): ?Team;
+    
+    public function getAttackGoal(): Goal;
+    public function getDefenseGoal(): Goal;
+
     public function getMe(): Player;
     public function getMyState(): PlayerState;
     public function getMyTeam(): ?Team;
@@ -28,27 +35,33 @@ interface IGameInspector {
     public function getMyPlayers(): array;
     public function getMyGoalkeeper(): ?Player;
     public function getMyScore(): float;
-    public function getBall(): ?Ball;
-    public function getPlayer(Side $side, int $number): ?Player;
     public function getMyPlayer(int $number): ?Player;
+    
     public function getOpponentPlayer(int $number): ?Player;
-    public function getTeam(Side $side): ?Team;
     public function getOpponentTeam(): ?Team;
     public function getOpponentSide(): Side;
     public function getOpponentPlayers(): array;
     public function getOpponentGoalkeeper(): ?Player;
     public function getOpponentScore(): float;
-    public function getDefenseGoal(): Goal;
-    public function getAttackGoal(): Goal;
 
     public function makeOrderMoveToPoint(Point $point, ?float $speed): Order;
+    public function makeOrderKickToPoint(Point $target, ?float $speed): Order;
+
     public function makeOrderMoveToDirection(Vector2D $direction, ?float $speed): Order;
+    public function makeOrderKickToDirection(Vector2D $direction, ?float $speed): Order;
+    
     public function makeOrderMoveToRegion(IRegion $region, ?float $speed): Order;
     public function makeOrderKickToRegion(IRegion $region, ?float $speed): Order;
-    public function makeOrderMoveToStop(): Order;
-    public function makeOrderJumpToPoint(Point $target, ?float $speed): Order;
-    public function makeOrderKickToPoint(Point $target, ?float $speed): Order;
-    public function makeOrderKickToDirection(Vector2D $direction, ?float $speed): Order;
+    
+    public function makeOrderMoveToPlayer(Player $player, ?float $speed): Order;
     public function makeOrderKickToPlayer(Player $player, ?float $speed): Order;
+    
+    public function makeOrderLookAtPoint(Point $point): Order;
+    public function makeOrderLookAtDirection(Vector2D $direction): Order;
+
+    public function makeOrderStop(): Order;
+
+    public function makeOrderJumpToPoint(Point $target, ?float $speed): Order;
+
     public function makeOrderCatch(): Order;
 }

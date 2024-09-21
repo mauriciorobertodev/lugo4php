@@ -15,11 +15,12 @@ class Env implements IEnv {
     private string $botToken;
 
     public function __construct() {
-        $this->grpcUrl = $_ENV['BOT_GRPC_URL'] ?? 'localhost:5000';
-        $this->grpcInsecure = filter_var($_ENV['BOT_GRPC_INSECURE'] ?? 'true', FILTER_VALIDATE_BOOLEAN);
-        $this->botSide = Side::fromString(strtolower($_ENV['BOT_TEAM'] ?? ''));
-        $this->botNumber = $this->validateBotNumber($_ENV['BOT_NUMBER'] ?? '');
-        $this->botToken = $_ENV['BOT_TOKEN'] ?? '';
+        $this->grpcUrl = getenv('BOT_GRPC_URL') ? getenv('BOT_GRPC_URL') : 'localhost:5000';
+        $this->grpcInsecure = filter_var(getenv('BOT_GRPC_INSECURE') ? getenv('BOT_GRPC_INSECURE') : 'true', FILTER_VALIDATE_BOOLEAN);
+        $this->botSide = Side::fromString(strtolower(getenv('BOT_TEAM') ?? ''));
+        $this->botNumber = $this->validateBotNumber(getenv('BOT_NUMBER') ?? '');
+        $this->botToken = getenv('BOT_TOKEN') ?? '';
+        $this->throwIfNeedToken();
     }
 
     public function getGrpcUrl(): string {
@@ -46,9 +47,15 @@ class Env implements IEnv {
         $number = (int) $botNumber;
         if ($number < 1 || $number > SPECS::MAX_PLAYERS) {
             throw new InvalidArgumentException(
-                "Invalid bot number '{$number}', must be between 1 and " . SPECS::MAX_PLAYERS
+                sprintf("Número do bot inválido, '%s', deve estar entre 1 e %s", $number, SPECS::MAX_PLAYERS)
             );
         }
         return $number;
+    }
+    
+    private function throwIfNeedToken(): void {
+        if(!$this->botToken && !$this->grpcInsecure)  {
+            throw new InvalidArgumentException("Partida no modo seguro é necessário definir um token válido");
+        }
     }
 }

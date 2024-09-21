@@ -9,8 +9,8 @@ interface IMapper
     public function getCols(): int;
     public function setCols(int $cols): self;
     public function getRows(): int;
-    public function getRegionWidth(): int;
-    public function getRegionHeight(): int;
+    public function getRegionWidth(): float;
+    public function getRegionHeight(): float;
     public function setRows(int $rows): self;
     public function getSide(): Side;
     public function getRegion(int $col, int $row): IRegion;

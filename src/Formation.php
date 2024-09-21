@@ -7,6 +7,11 @@ use Lugo4php\Interfaces\IFormation;
 
 class Formation implements IFormation
 {
+    /**
+     * @param Point[] $positions
+     * @param string $name
+     * @param FormationType|null $type
+     */
     public function __construct(private array $positions, private string $name = '', private FormationType|null $type = null) {
 		if(!$name) $this->name = uniqid();
 	}

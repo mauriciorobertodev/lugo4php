@@ -8,6 +8,9 @@ use Lugo\Point as LugoPoint;
 use Lugo\Vector as LugoVector;
 
 interface IPositionable {
+    public function eq(IPositionable $positionable): bool;
+    public function is(IPositionable $positionable): bool;
+
     public function getX(): float;
     public function setX(float $x): self;
     public function addX(float $value): self;

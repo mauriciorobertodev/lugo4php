@@ -21,4 +21,13 @@ interface IPlayer
     public function isGoalkeeper(): bool;
     public function is(Player $player): bool;
     public function eq(Player $player): bool;
+
+    // public function isInAttackSide(): bool;
+    // public function isInDefenseSide(): bool;
+    // public function getDirectionToPlayer(Player $player): Vector2D;
+    // public function getDirectionToPoint(Point $point): Vector2D;
+    // public function getDirectionToRegion(IRegion $region): Vector2D;
+    // public function getDistanceToPlayer(Player $player): float;
+    // public function getDistanceToPoint(Point $point): float;
+    // public function getDistanceToRegion(IRegion $region): float;
 }

@@ -18,20 +18,23 @@ class Mapper implements IMapper {
         private Side $side
     ) {
         if ($cols < 4) {
-            throw new \RuntimeException("Número de colunas abaixo do mínimo permitido");
-        }
-        if ($cols > 200) {
-            throw new \RuntimeException("Número de colunas acima do máximo permitido");
-        }
-        if ($rows < 2) {
-            throw new \RuntimeException("Número de linhas abaixo do mínimo permitido");
-        }
-        if ($rows > 100) {
-            throw new \RuntimeException("Número de linhas acima do máximo permitido");
+            throw new \InvalidArgumentException("Número de colunas abaixo do mínimo permitido");
         }
 
-        $this->regionWidth = SPECS::MAX_X_COORDINATE / $cols;
-        $this->regionHeight = SPECS::MAX_Y_COORDINATE / $rows;
+        if ($cols > 200) {
+            throw new \InvalidArgumentException("Número de colunas acima do máximo permitido");
+        }
+
+        if ($rows < 2) {
+            throw new \InvalidArgumentException("Número de linhas abaixo do mínimo permitido");
+        }
+        
+        if ($rows > 100) {
+            throw new \InvalidArgumentException("Número de linhas acima do máximo permitido");
+        }
+
+        $this->regionWidth = SPECS::FIELD_WIDTH / $cols;
+        $this->regionHeight = SPECS::FIELD_HEIGHT / $rows;
     }
 
     public function getCols(): int
@@ -42,6 +45,8 @@ class Mapper implements IMapper {
     public function setCols(int $cols): self
     {
         $this->cols = $cols;
+        $this->regionWidth = SPECS::FIELD_WIDTH / $cols;
+
         return $this;
     }
 
@@ -53,6 +58,7 @@ class Mapper implements IMapper {
     public function setRows(int $rows): self
     {
         $this->rows = $rows;
+        $this->regionHeight = SPECS::FIELD_HEIGHT / $rows;
         return $this;
     }
 
@@ -88,12 +94,12 @@ class Mapper implements IMapper {
         return new Region($col, $row, $this->side, $center, $this);
     }
     
-    public function getRegionWidth(): int
+    public function getRegionWidth(): float
     {
         return $this->regionWidth;
     }
 
-    public function getRegionHeight(): int
+    public function getRegionHeight(): float
     {
         return $this->regionHeight;
     }
@@ -119,8 +125,8 @@ class Mapper implements IMapper {
 
     private function mirrorCoordsToAway(Point $center): Point {
         $mirrored = new Point();
-        $mirrored->setX(SPECS::MAX_X_COORDINATE - $center->getX());
-        $mirrored->setY(SPECS::MAX_Y_COORDINATE - $center->getY());
+        $mirrored->setX(SPECS::FIELD_WIDTH - $center->getX());
+        $mirrored->setY(SPECS::FIELD_HEIGHT - $center->getY());
         return $mirrored;
     }
 }

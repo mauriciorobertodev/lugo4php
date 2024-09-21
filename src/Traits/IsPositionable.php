@@ -202,4 +202,14 @@ trait IsPositionable {
     {
         return new Point($this->x, $this->y);
     }
+
+    public function is(IPositionable $positionable): bool
+    {
+        return $this->getX() === $positionable->getX() &&  $this->getY() === $positionable->getY();
+    }
+
+    public function eq(IPositionable $positionable): bool
+    {
+        return $this->is($positionable);
+    }
 }

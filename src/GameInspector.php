@@ -13,6 +13,7 @@ use Lugo\JumpOrder;
 use Lugo\KickOrder;
 use Lugo\MoveOrder;
 use Lugo\CatchOrder;
+use RuntimeException;
 
 class GameInspector implements IGameInspector {
     private Player $me;
@@ -21,14 +22,7 @@ class GameInspector implements IGameInspector {
 
     public function __construct(Side $botSide, int $playerNumber, GameSnapshot $gameSnapshot) {
         $this->snapshot = $gameSnapshot;
-
-        $me = $this->getPlayer($botSide, $playerNumber);
-
-        if (!$me) {
-            throw new \RuntimeException("Não foi possível encontrar o jogador {$botSide->toString()}-{$playerNumber}");
-        }
-
-        $this->me = $me;
+        $this->me = $this->getPlayer($botSide, $playerNumber);
         $this->myState = $this->definePlayerState();
     }
 
@@ -162,50 +156,6 @@ class GameInspector implements IGameInspector {
         return $this->makeOrderMoveToDirection($direction, $speed);
     }
 
-    public function makeOrderMoveToDirection(Vector2D $direction, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order
-    {
-        $vel = Velocity::newZeroed();
-        $vel->setDirection($direction);
-        $vel->setSpeed($speed);
-
-        $moveOrder = new MoveOrder();
-        $moveOrder->setVelocity($vel->toLugoVelocity());
-
-        return (new Order())->setMove($moveOrder);
-    }
-
-    public function makeOrderMoveToRegion(IRegion $region, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
-        $direction = $this->getMe()->getPosition()->directionTo($region->getCenter());
-        return $this->makeOrderMoveToDirection($direction, $speed);
-    }
-
-    public function makeOrderKickToRegion(IRegion $region, ?float $speed): Order
-    {
-        $direction = $this->getMe()->getPosition()->directionTo($region->getCenter());
-        return $this->makeOrderKickToDirection($direction, $speed);
-    }
-
-    public function makeOrderMoveToStop(): Order
-    {
-        $direction = $this->getMe()->getVelocity()->getDirection();
-        return $this->makeOrderMoveToDirection($direction, 0);
-    }
-
-    public function makeOrderJumpToPoint(Point $point, ?float $speed = SPECS::GOALKEEPER_JUMP_MAX_SPEED): Order
-    {
-        $origin = $this->getMe()->getPosition() ?? new Point();
-        $direction = $origin->directionTo($point);
-
-        $vel = Velocity::newZeroed();
-        $vel->setDirection($direction);
-        $vel->setSpeed($speed);
-
-        $jump = new JumpOrder();
-        $jump->setVelocity($vel->toLugoVelocity());
-
-        return (new Order())->setJump($jump);
-    }
-
     public function makeOrderKickToPoint(Point $point, ?float $speed = SPECS::BALL_MAX_SPEED): Order
     {
         $ballPosition = $this->getBall()?->getPosition() ?? new Point();
@@ -214,11 +164,19 @@ class GameInspector implements IGameInspector {
         return $this->makeOrderKickToDirection($ballDirection, $speed);
     }
 
-    public function makeOrderKickToDirection(Vector2D $direction, ?float $speed): Order
+    public function makeOrderMoveToDirection(Vector2D $direction, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order
     {
-        $vel = Velocity::newZeroed();
-        $vel->setDirection($direction);
-        $vel->setSpeed($speed);
+        $vel = new Velocity($direction, $speed); 
+
+        $moveOrder = new MoveOrder();
+        $moveOrder->setVelocity($vel->toLugoVelocity());
+
+        return (new Order())->setMove($moveOrder);
+    }
+
+    public function makeOrderKickToDirection(Vector2D $direction, ?float $speed = SPECS::BALL_MAX_SPEED): Order
+    {
+        $vel = new Velocity($direction, $speed);
 
         $kick = new KickOrder();
         $kick->setVelocity($vel->toLugoVelocity());
@@ -226,8 +184,51 @@ class GameInspector implements IGameInspector {
         return (new Order())->setKick($kick);
     }
 
+    public function makeOrderMoveToRegion(IRegion $region, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        $direction = $this->getMyPosition()->directionTo($region->getCenter());
+        return $this->makeOrderMoveToDirection($direction, $speed);
+    }
+
+    public function makeOrderKickToRegion(IRegion $region, ?float $speed = SPECS::BALL_MAX_SPEED): Order
+    {
+        $direction = $this->getMyPosition()->directionTo($region->getCenter());
+        return $this->makeOrderKickToDirection($direction, $speed);
+    }
+
+    public function makeOrderJumpToPoint(Point $point, ?float $speed = SPECS::GOALKEEPER_JUMP_MAX_SPEED): Order
+    {
+        $origin = $this->getMyPosition();
+        $direction = $origin->directionTo($point);
+        $upOrDown = $direction->getY() > 0 ? new Vector2D(0, 1) : new Vector2D(0, -1);
+        $vel = new Velocity($upOrDown, $speed);
+
+        $jump = new JumpOrder();
+        $jump->setVelocity($vel->toLugoVelocity());
+
+        return (new Order())->setJump($jump);
+    }
+
+    public function makeOrderMoveToPlayer(Player $player, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        return $this->makeOrderMoveToPoint($player->getPosition(), $speed);
+    }
+
     public function makeOrderKickToPlayer(Player $player, ?float $speed = SPECS::BALL_MAX_SPEED): Order {
         return $this->makeOrderKickToPoint($player->getPosition(), $speed);
+    }
+
+    public function makeOrderLookAtPoint(Point $point): Order
+    {
+        return $this->makeOrderLookAtDirection($this->getMyPosition()->directionTo($point));
+    }
+    
+    public function makeOrderLookAtDirection(Vector2D $direction): Order
+    {
+        return $this->makeOrderMoveToDirection($direction, 0);
+    }
+
+    public function makeOrderStop(): Order
+    {
+        return $this->makeOrderLookAtDirection($this->getMyDirection());
     }
 
     public function makeOrderCatch(): Order
@@ -238,22 +239,19 @@ class GameInspector implements IGameInspector {
     private function definePlayerState(): PlayerState
     {
         if (!$this->getBall()) {
-            throw new \RuntimeException('Estado de snapshot inválido - não é possível definir o estado do jogador.');
-        }
-
-        if (!$this->getPlayer($this->getMySide(), $this->getMyNumber())) {
-            throw new \RuntimeException('Não foi possível encontrar o bot no snapshot - não é possível definir o estado do jogador.');
+            throw new RuntimeException('Estado de snapshot inválido - não é possível definir o estado do jogador.');
         }
 
         $ballHolder = $this->getBall()->getHolder();
         if (!$ballHolder) {
             return PlayerState::DISPUTING;
         } 
+
+        if($ballHolder->is($this->getMe())) {
+            return PlayerState::HOLDING;
+        }
         
         if($ballHolder->getSide() === $this->getMySide()) {
-            if ($ballHolder->getNumber() === $this->getMyNumber()) {
-                return PlayerState::HOLDING;
-            }
             return PlayerState::SUPPORTING;
         }
 

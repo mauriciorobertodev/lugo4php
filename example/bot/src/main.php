@@ -15,12 +15,7 @@ $mapper = new Mapper(MAPPER_COLS, MAPPER_ROWS, $env->getBotSide());
 $initRegion = PLAYER_INITIAL_POSITIONS[$env->getBotNumber()];
 $initPosition = $mapper->getRegion($initRegion['col'], $initRegion['row'])->getCenter();
 
-$bot = new BotTester(
-	$env->getBotNumber(),
-	$env->getBotSide(),
-	$initPosition,
-	$mapper
-);
+$bot = new BotTester($mapper);
 
 $client = new Client(
 	$env->getGrpcUrl(),

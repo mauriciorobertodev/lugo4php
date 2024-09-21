@@ -10,7 +10,7 @@ enum Side: int {
         return match (strtolower($value)) {
             'home' => self::HOME,
             'away' => self::AWAY,
-            default => throw new \InvalidArgumentException("Valor inválido para o lado do time: '{$value}'"),
+            default => throw new \InvalidArgumentException(sprintf("Valor inválido para o lado do time: '%s'", $value)),
         };
     }
 

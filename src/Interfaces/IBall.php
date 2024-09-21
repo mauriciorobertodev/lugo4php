@@ -13,9 +13,8 @@ interface IBall
     public function getVelocity(): ?Velocity;
     public function setVelocity(Velocity $var): self;
     public function getDirection(): Vector2D;
-    public function getSped(): float;
+    public function getSpeed(): float;
     public function hasHolder(): bool;
     public function getHolder(): ?Player;
     public function holderIs(Player $holder): bool;
-    public function setHolder(?Player $var): self;
 }
