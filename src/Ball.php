@@ -60,7 +60,7 @@ class Ball implements IBall
 	public function holderIs(Player $holder): bool
 	{
 		if(!$this->holder) return false;
-		return $this->holder->getNumber() === $holder->getNumber() && $this->holder->getSide() === $holder->getSide();
+		return $this->holder->getNumber() === $holder->getNumber() && $this->holder->getTeamSide() === $holder->getTeamSide();
 	}
 
 	public function toLugoBall(): LugoBall

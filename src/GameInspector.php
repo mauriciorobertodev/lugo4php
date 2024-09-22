@@ -50,8 +50,13 @@ class GameInspector implements IGameInspector {
         return $this->getMe()->getNumber();
     }
 
+    public function getFieldCenter(): Point
+    {
+        return new Point(SPECS::FIELD_CENTER_X, SPECS::FIELD_CENTER_Y);
+    }
+
     public function getMySide(): Side {
-        return $this->getMe()->getSide();
+        return $this->getMe()->getTeamSide();
     }
 
     public function getMyPosition(): Point
@@ -251,7 +256,7 @@ class GameInspector implements IGameInspector {
             return PlayerState::HOLDING;
         }
         
-        if($ballHolder->getSide() === $this->getMySide()) {
+        if($ballHolder->getTeamSide() === $this->getMySide()) {
             return PlayerState::SUPPORTING;
         }
 

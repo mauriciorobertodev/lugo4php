@@ -3,6 +3,7 @@ namespace Lugo4php;
 
 use Lugo\Player as LugoPlayer;
 use Lugo4php\Interfaces\IPlayer;
+use Lugo4php\Interfaces\IRegion;
 use Lugo4php\Side;
 use Lugo\Team_Side;
 
@@ -41,7 +42,7 @@ class Player implements IPlayer {
 		return $this->velocity;
 	}
 
-    public function getSide(): Side {
+    public function getTeamSide(): Side {
 		return $this->side;
 	}
 
@@ -67,7 +68,49 @@ class Player implements IPlayer {
 	
 	public function eq(Player $player): bool
 	{
-		return $this->side === $player->getSide() && $this->number === $player->getNumber();
+		return $this->side === $player->getTeamSide() && $this->number === $player->getNumber();
+	}
+
+	public function isInAttackSide(): bool
+	{
+		$more = $this->getPosition()->getX() > SPECS::FIELD_CENTER_X;
+		return $this->side === Side::HOME ? $more : !$more;
+	}
+	
+	public function isInDefenseSide(): bool
+	{
+		$less = $this->getPosition()->getX() < SPECS::FIELD_CENTER_X;
+		return $this->side === Side::HOME ? $less : !$less;	
+	}
+
+	public function directionToPlayer(Player $player): Vector2D
+	{
+		return $this->position->directionTo($player->getPosition());
+	}
+
+	public function distanceToPlayer(Player $player): float
+	{
+		return $this->position->distanceTo($player->getPosition());
+	}
+
+	public function directionToRegion(IRegion $region): Vector2D
+	{
+		return $this->position->directionTo($region->getCenter());
+	}
+
+	public function distanceToRegion(IRegion $region): float
+	{
+		return $this->position->distanceTo($region->getCenter());
+	}
+
+	public function directionToPoint(Point $point): Vector2D
+	{
+		return $this->position->directionTo($point);
+	}
+
+	public function distanceToPoint(Point $point): float
+	{
+		return $this->position->distanceTo($point);
 	}
 
 	public function toLugoPlayer(): LugoPlayer

@@ -13,7 +13,7 @@ use Lugo\JoinRequest;
 use Lugo\OrderSet;
 use Lugo4php\PlayerState;
 use Lugo4php\Side;
-use Lugo\BroadcastClient;
+use Lugo\Order;
 
 const PROTOCOL_VERSION = "1.0.0";
 
@@ -64,8 +64,6 @@ class Client implements IClient {
             if($response->getState() === GameSnapshot_State::GET_READY) {
                 $inspector = new GameInspector($this->side, $this->number, $response);
                 $bot->onReady($inspector);
-
-                
             }
             
             /**
@@ -111,15 +109,13 @@ class Client implements IClient {
         }
     }
 
-    private function onListening(GameInspector $inspector, IBot $bot) : void {
+    public function getOrderSet(GameInspector $inspector, IBot $bot): OrderSet
+    {
         $bot->beforeAction($inspector);
 
         $playerState = $inspector->getMyState();
-        $isGoalkeeper = $inspector->getMe()->isGoalkeeper();
 
-        $orders = [];
-
-        if($isGoalkeeper) {
+        if($inspector->getMe()->isGoalkeeper()) {
             $orders = $bot->asGoalkeeper($inspector, $playerState);
         } else {
             $orders = match ($playerState) {
@@ -132,33 +128,15 @@ class Client implements IClient {
 
         $orderSet = new OrderSet();
         $orderSet->setTurn($inspector->getTurn());
-        $orderSet->setOrders($orders);
+        $orderSet->setOrders(array_values(array_filter($orders, fn($order) => $order instanceof Order)));
+        return $orderSet;
+    }
+
+    private function onListening(GameInspector $inspector, IBot $bot) : void {
+        $orderSet = $this->getOrderSet($inspector, $bot);
 
         $call = $this->client->SendOrders($orderSet);
 
         list($response, $status) = $call->wait();
-
-        // $statusCode = $response->getCode();
-
-        // switch ($statusCode) {
-        //     case \Lugo\OrderResponse_StatusCode::SUCCESS:
-        //         echo "Ordem enviada com sucesso!";
-        //         break;
-        //     case \Lugo\OrderResponse_StatusCode::UNKNOWN_PLAYER:
-        //         echo "Jogador desconhecido.";
-        //         break;
-        //     case \Lugo\OrderResponse_StatusCode::NOT_LISTENING:
-        //         echo "Servidor não está ouvindo.";
-        //         break;
-        //     case \Lugo\OrderResponse_StatusCode::WRONG_TURN:
-        //         echo "Ordem enviada no turno errado. Verifique a sequência de turnos.";
-        //         break;
-        //     case \Lugo\OrderResponse_StatusCode::OTHER:
-        //         echo "Erro desconhecido.";
-        //         break;
-        //     default:
-        //         echo "Status não reconhecido: " . $statusCode;
-        //         break;
-        // }
     }
 }

@@ -19,6 +19,7 @@ interface IGameInspector {
     public function getBall(): ?Ball;
     public function getPlayer(Side $side, int $number): ?Player;
     public function getTeam(Side $side): ?Team;
+    public function getFieldCenter():  Point;
     
     public function getAttackGoal(): Goal;
     public function getDefenseGoal(): Goal;

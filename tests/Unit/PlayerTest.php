@@ -1,5 +1,6 @@
 <?php
 
+use Lugo4php\Mapper;
 use Lugo4php\Player;
 use Lugo4php\Side;
 use Lugo4php\Point;
@@ -21,7 +22,7 @@ test('DEVE criar um Player com os atributos corretos', function () {
     expect($player->getDirection())->toEqual(new Vector2D(1, 0));
     expect($player->getPosition())->toEqual($position);
     expect($player->getVelocity())->toEqual($velocity);
-    expect($player->getSide())->toBe($side);
+    expect($player->getTeamSide())->toBe($side);
     expect($player->getInitPosition())->toEqual($initPosition);
     expect($player->getIsJumping())->toBeTrue();
 });
@@ -73,7 +74,61 @@ test('DEVE converter um Player para LugoPlayer e vice-versa', function () {
     expect($convertedPlayer->getDirection())->toEqual($player->getDirection());
     expect($convertedPlayer->getPosition())->toEqual($player->getPosition());
     expect($convertedPlayer->getVelocity())->toEqual($player->getVelocity());
-    expect($convertedPlayer->getSide())->toBe($player->getSide());
+    expect($convertedPlayer->getTeamSide())->toBe($player->getTeamSide());
     expect($convertedPlayer->getInitPosition())->toEqual($player->getInitPosition());
     expect($convertedPlayer->getIsJumping())->toBe($player->getIsJumping());
+});
+
+test('DEVE retornar corretamente se está no campo de defesa ou ataque', function () {
+    $side = Side::HOME;
+    $position = new Point(10, 20);
+    $player = new Player(7, true, $side, $position, randomPoint(), randomVelocity());
+    expect($player->isInAttackSide())->toBeFalse();
+    expect($player->isInDefenseSide())->toBeTrue();
+
+    $side = Side::AWAY;
+    $position = new Point(10, 20);
+    $player = new Player(7, true, $side, $position, randomPoint(), randomVelocity());
+    expect($player->isInAttackSide())->toBeTrue();
+    expect($player->isInDefenseSide())->toBeFalse();
+});
+
+test('DEVE retornar a direção e distancia para um player', function () {
+    $side = Side::HOME;
+    $position = new Point(10, 20);
+    $player = new Player(7, true, $side, $position, randomPoint(), randomVelocity());
+    $player2 = randomPlayer();
+
+    $direction =  $player->directionToPlayer($player2);
+    $distance = $player->distanceToPlayer($player2);
+
+    expect($direction)->toEqual($player->getPosition()->directionTo($player2->getPosition()));
+    expect($distance)->toEqual($player->getPosition()->distanceTo($player2->getPosition()));
+});
+
+test('DEVE retornar a direção e distancia para um ponto', function () {
+    $side = Side::HOME;
+    $position = new Point(10, 20);
+    $player = new Player(7, true, $side, $position, randomPoint(), randomVelocity());
+    $point = randomPoint();
+
+    $direction =  $player->directionToPoint($point);
+    $distance = $player->distanceToPoint($point);
+
+    expect($direction)->toEqual($player->getPosition()->directionTo($point));
+    expect($distance)->toEqual($player->getPosition()->distanceTo($point));
+});
+
+test('DEVE retornar a direção e distancia para uma região', function () {
+    $side = Side::HOME;
+    $position = new Point(10, 20);
+    $player = new Player(7, true, $side, $position, randomPoint(), randomVelocity());
+    $mapper = new Mapper(10, 10, Side::HOME);
+    $region = $mapper->getRandomRegion();
+
+    $direction =  $player->directionToRegion($region);
+    $distance = $player->distanceToRegion($region);
+
+    expect($direction)->toEqual($player->getPosition()->directionTo($region->getCenter()));
+    expect($distance)->toEqual($player->getPosition()->distanceTo($region->getCenter()));
 });

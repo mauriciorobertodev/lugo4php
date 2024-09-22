@@ -8,7 +8,13 @@ enum PlayerState: string {
     case DEFENDING = "defending";
     case DISPUTING = "disputing";
 
-    public static function fromString(string $value): self {
+    public function is(PlayerState $state): bool
+    {
+        return $this === $state;
+    }
+
+    public static function fromString(string $value): self
+    {
         return match (strtolower($value)) {
             'supporting' => self::SUPPORTING,
             'holding' => self::HOLDING,

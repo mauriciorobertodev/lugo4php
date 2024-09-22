@@ -47,12 +47,12 @@ test('DEVE retornar corretamente as propriedades do player', function () {
     expect($inspector->getTurn())->toEqual($snapshot->getTurn());
     expect($inspector->getSnapshot())->toEqual($snapshot);
     expect($inspector->getMe()->getNumber())->toEqual($botNumber);
-    expect($inspector->getMe()->getSide())->toEqual($botSide);
+    expect($inspector->getMe()->getTeamSide())->toEqual($botSide);
     expect($inspector->getMyNumber())->toEqual($botNumber);
     expect($inspector->getMySide())->toEqual($botSide);
     expect($inspector->getMyTeam())->toEqual(Team::fromLugoTeam($snapshot->getHomeTeam()));
     expect($inspector->getMyGoalkeeper()->getNumber())->toEqual(SPECS::GOALKEEPER_NUMBER);
-    expect($inspector->getMyGoalkeeper()->getSide())->toEqual($botSide);
+    expect($inspector->getMyGoalkeeper()->getTeamSide())->toEqual($botSide);
     expect($inspector->getMyPosition())->toEqual($lugo4phpMe->getPosition());
     expect($inspector->getMyDirection())->toEqual($lugo4phpMe->getDirection());
     expect($inspector->getMySpeed())->toEqual($lugo4phpMe->getSpeed());
@@ -302,19 +302,21 @@ test('DEVE lançar um erro ao tentar descobrir o estado do jogador sem aver uma 
 })->throws(RuntimeException::class, 'Estado de snapshot inválido - não é possível definir o estado do jogador.');
 
 test('DEVE retornar corretamente o estado do jogador', function () {
-    $snapshot = randomGameInspectorInState(Side::HOME, 10, PlayerState::DEFENDING);
-    $inspector = new GameInspector(Side::HOME, 10, $snapshot);
+    $inspector = randomGameInspectorInDefending(Side::HOME, 10);
 	expect($inspector->getMyState())->toBe(PlayerState::DEFENDING);
 
-	$snapshot = randomGameInspectorInState(Side::HOME, 10, PlayerState::SUPPORTING);
-    $inspector = new GameInspector(Side::HOME, 10, $snapshot);
+	$inspector = randomGameInspectorInSupporting(Side::HOME, 10);
 	expect($inspector->getMyState())->toBe(PlayerState::SUPPORTING);
 
-	$snapshot = randomGameInspectorInState(Side::HOME, 10, PlayerState::HOLDING);
-    $inspector = new GameInspector(Side::HOME, 10, $snapshot);
+	$inspector = randomGameInspectorInHolding(Side::HOME, 10);
 	expect($inspector->getMyState())->toBe(PlayerState::HOLDING);
 
-	$snapshot = randomGameInspectorInState(Side::HOME, 10, PlayerState::DISPUTING);
-    $inspector = new GameInspector(Side::HOME, 10, $snapshot);
+	$inspector = randomGameInspectorInDisputing(Side::HOME, 10);
 	expect($inspector->getMyState())->toBe(PlayerState::DISPUTING);
+});
+
+test('DEVE retornar o centro do campo', function () {
+    $inspector = new GameInspector(Side::HOME, 10, randomLugoGameSnapshot());
+	
+	expect($inspector->getFieldCenter())->toEqual(new Point(SPECS::FIELD_CENTER_X, SPECS::FIELD_CENTER_Y));
 });

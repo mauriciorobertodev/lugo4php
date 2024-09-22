@@ -151,7 +151,7 @@ if (!function_exists('removeAnsiCodes')) {
 }
 
 if (!function_exists('randomLugoGameSnapshotInState')) {
-    function randomGameInspectorInState(Side $side, int $number, PlayerState $playerState): LugoGameSnapshot {
+    function randomLugoGameSnapshotInState(Side $side, int $number, PlayerState $playerState): LugoGameSnapshot {
         $snapshot = randomLugoGameSnapshot();
 
         $playerTeam = $side === Side::HOME ? $snapshot->getHomeTeam() : $snapshot->getAwayTeam();
@@ -193,28 +193,28 @@ if (!function_exists('randomLugoGameSnapshotInState')) {
 
 if (!function_exists('randomGameInspectorInDisputing')) {
     function randomGameInspectorInDisputing(Side $side, int $number, LugoGameSnapshot|null $snapshot = null): GameInspector {
-        $snapshot = randomLugoGameSnapshot($side, $number, PlayerState::DISPUTING);
+        $snapshot = randomLugoGameSnapshotInState($side, $number, PlayerState::DISPUTING);
         return new GameInspector($side, $number, $snapshot);
     }
 }
 
 if (!function_exists('randomGameInspectorInHolding')) {
     function randomGameInspectorInHolding(Side $side, int $number, LugoGameSnapshot|null $snapshot = null): GameInspector {
-        $snapshot = randomLugoGameSnapshot($side, $number, PlayerState::HOLDING);
+        $snapshot = randomLugoGameSnapshotInState($side, $number, PlayerState::HOLDING);
         return new GameInspector($side, $number, $snapshot);
     }
 }
 
 if (!function_exists('randomGameInspectorInDefending')) {
     function randomGameInspectorInDefending(Side $side, int $number, LugoGameSnapshot|null $snapshot = null): GameInspector {
-        $snapshot = randomLugoGameSnapshot($side, $number, PlayerState::DEFENDING);
+        $snapshot = randomLugoGameSnapshotInState($side, $number, PlayerState::DEFENDING);
         return new GameInspector($side, $number, $snapshot);
     }
 }
 
 if (!function_exists('randomGameInspectorInSupporting')) {
     function randomGameInspectorInSupporting(Side $side, int $number, LugoGameSnapshot|null $snapshot = null): GameInspector {
-        $snapshot = randomLugoGameSnapshot($side, $number, PlayerState::SUPPORTING);
+        $snapshot = randomLugoGameSnapshotInState($side, $number, PlayerState::SUPPORTING);
         return new GameInspector($side, $number, $snapshot);
     }
 }

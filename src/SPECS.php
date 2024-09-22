@@ -41,4 +41,7 @@ class SPECS
 
     public const FIELD_WIDTH = 200 * self::BASE_UNIT;
     public const FIELD_HEIGHT = 100 * self::BASE_UNIT;
+
+    public const FIELD_CENTER_X = self::MAX_X_COORDINATE / 2;
+    public const FIELD_CENTER_Y = self::MAX_Y_COORDINATE / 2;
 }
