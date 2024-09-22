@@ -17,13 +17,12 @@ class BotTester implements IBot
 	public function onDisputing(GameInspector $inspector): array
 	{
 		$orders = [];
-		$me = $inspector->getMe();
 		$ballPosition = $inspector->getBall()->getPosition();
 
 		$ballRegion = $this->mapper->getRegionFromPoint($ballPosition);
-		$myRegion = $this->mapper->getRegionFromPoint($me->getPosition());
+		$myRegion = $this->mapper->getRegionFromPoint($inspector->getMyPosition());
 
-		$moveDestination = $this->getMyExpectedPosition($inspector, $this->mapper, $me->getNumber());
+		$moveDestination = $this->getMyExpectedPosition($inspector, $this->mapper, $inspector->getMyNumber());
 
 		if ($myRegion->distanceToRegion($ballRegion) <= 2) {
 			$moveDestination = $ballPosition;
@@ -41,11 +40,10 @@ class BotTester implements IBot
 	public function onHolding(GameInspector $inspector): array
 	{
 		$orders = [];
-		$me = $inspector->getMe();
 
 		$attackGoalCenter = $inspector->getAttackGoal()->getCenter();
 		$opponentGoalRegion = $this->mapper->getRegionFromPoint($attackGoalCenter);
-		$currentRegion = $this->mapper->getRegionFromPoint($me->getPosition());
+		$currentRegion = $this->mapper->getRegionFromPoint($inspector->getMyPosition());
 
 		if ($currentRegion->distanceToRegion($opponentGoalRegion) <= 2) {
 			$orders[] = $inspector->makeOrderKickToPoint($attackGoalCenter);
@@ -59,13 +57,12 @@ class BotTester implements IBot
 	public function onDefending(GameInspector $inspector): array
 	{
 		$orders = [];
-		$me = $inspector->getMe();
 		$ballPosition = $inspector->getBall()->getPosition();
 		$ballRegion = $this->mapper->getRegionFromPoint($ballPosition);
-		$myRegion = $this->mapper->getRegionFromPoint($me->getPosition());
+		$myRegion = $this->mapper->getRegionFromPoint($inspector->getMyPosition());
 
 		// Por padrão, vou ficar na minha posição tática
-		$moveDestination = $this->getMyExpectedPosition($inspector, $this->mapper, $me->getNumber());
+		$moveDestination = $this->getMyExpectedPosition($inspector, $this->mapper, $inspector->getMyNumber());
 
 		// Se a bola estiver no máximo 2 blocos de distância de mim, vou em direção à bola
 		if ($myRegion->distanceToRegion($ballRegion) <= 2) {
@@ -107,7 +104,6 @@ class BotTester implements IBot
 
 	public function getMyExpectedPosition(GameInspector $inspector, Mapper $mapper): Point
     {
-		$me = $inspector->getMe();
         $ballPosition = $inspector->getBall()->getPosition();
         $ballRegion = $mapper->getRegionFromPoint($ballPosition);
         $fieldThird = $this->mapper->getCols() / 3;
@@ -120,7 +116,7 @@ class BotTester implements IBot
 			$tacticPositions = Formation::createFromArray(NORMAL);
         }
 
-		$position = $tacticPositions->getPositionOf($me->getNumber());
+		$position = $tacticPositions->getPositionOf($inspector->getMyNumber());
     
         $expectedRegion = $mapper->getRegion($position->getX(), $position->getY());
 
