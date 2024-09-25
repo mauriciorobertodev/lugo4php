@@ -9,4 +9,5 @@ interface ITeam {
     public function getName(): string;
     public function getScore(): int;
     public function getSide(): Side;
+    public function hasPlayer(int $number): bool;
 }

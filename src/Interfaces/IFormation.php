@@ -63,5 +63,6 @@ interface IFormation
 
     public function toArray(): array;
 
-    public static function createZeroed(): self;
+    public static function createZeroed(): IFormation;
+    public static function createFromArray(array $array): IFormation;
 }

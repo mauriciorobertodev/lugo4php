@@ -13,7 +13,7 @@ enum PlayerState: string {
         return $this === $state;
     }
 
-    public static function fromString(string $value): self
+    public static function fromString(string $value): PlayerState
     {
         return match (strtolower($value)) {
             'supporting' => self::SUPPORTING,

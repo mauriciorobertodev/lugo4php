@@ -35,6 +35,11 @@ class Team implements ITeam {
         return $this->side;
     }
 
+    public function hasPlayer(int $number): bool
+    {
+        return !empty(array_filter($this->players, fn(Player $player) => $player->getNumber() === $number));
+    }
+
     public static function fromLugoTeam(LugoTeam $lugoTeam): Team
     {
         return new Team(

@@ -78,5 +78,6 @@ class BotTester implements IBot
 
 	public function onReady(GameInspector $inspector): void {}
 
-	public function beforeAction(GameInspector $inspector): void {}
+	public function beforeActions(GameInspector $inspector): void {}
+	public function afterActions(GameInspector $inspector): void {}
 }

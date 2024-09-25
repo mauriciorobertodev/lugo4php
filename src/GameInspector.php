@@ -38,11 +38,21 @@ class GameInspector implements IGameInspector {
         return $this->me;
     }
 
+    public function hasShotClock(): bool
+    {
+        return (bool) $this->snapshot->getShotClock();
+    }
+
+    public function getShotClock(): ?ShotClock
+    {
+        return ShotClock::createFromLugoShotClock($this->snapshot->getShotClock());
+    }
+
     public function getMyState(): PlayerState {
         return $this->myState;
     }
 
-    public function getMyTeam(): ?Team {
+    public function getMyTeam(): Team {
         return $this->getTeam($this->getMySide());
     }
 
@@ -84,8 +94,12 @@ class GameInspector implements IGameInspector {
         return $this->getMyTeam()?->getPlayers() ?? [];
     }
 
-    public function getMyGoalkeeper(): ?Player {
+    public function getMyGoalkeeper(): Player {
         return $this->getPlayer($this->getMySide(), SPECS::GOALKEEPER_NUMBER);
+    }
+    
+    public function tryGetMyGoalkeeper(): ?Player {
+        return $this->tryGetPlayer($this->getMySide(), SPECS::GOALKEEPER_NUMBER);
     }
 
     public function getMyScore(): float
@@ -93,14 +107,45 @@ class GameInspector implements IGameInspector {
         return $this->getMyTeam()->getScore();
     }
 
-    public function getBall(): ?Ball {
-        return $this->snapshot->getBall() ? Ball::fromLugoBall($this->snapshot->getBall()) : null;
+    public function getBall(): Ball {
+        return  $this->snapshot->getBall() ? Ball::fromLugoBall($this->snapshot->getBall()) : Ball::newZeroed();
+    }
+
+    public function getBallHasHolder(): bool
+    {
+        return $this->getBall()->hasHolder();
+    }
+
+    public function getBallTurnsInGoalZone(): int
+    {
+        return $this->snapshot->getTurnsBallInGoalZone();
+    }
+    
+    public function getBallRemainingTurnsInGoalZone(): int
+    {
+        return SPECS::BALL_TIME_IN_GOAL_ZONE - $this->getBallTurnsInGoalZone();   
+    }
+
+    public function getBallPosition(): Point
+    {
+        return $this->getBall()->getPosition();
+    }
+
+    public function getBallDirection(): Vector2D
+    {
+        return $this->getBall()->getDirection();
+    }
+   
+    public function getBallSpeed(): float
+    {
+        return $this->getBall()->getSpeed();   
     }
 
     public function getPlayer(Side $side, int $number): Player {
         $team = $this->getTeam($side);
 
         if($team) {
+            
             foreach ($team->getPlayers() as $playerItem) {
                 if($number === $playerItem->getNumber()) {
                     return $playerItem;
@@ -111,22 +156,44 @@ class GameInspector implements IGameInspector {
         throw new Exception(sprintf('O time do lado %s não tem o player %s', $side->toString(), $number));
     }
     
+    public function tryGetPlayer(Side $side, int $number): ?Player {
+        $team = $this->getTeam($side);
+
+        if($team) {
+            foreach ($team->getPlayers() as $playerItem) {
+                if($number === $playerItem->getNumber()) {
+                    return $playerItem;
+                };
+            }
+        }
+
+        return null;
+    }
+    
     public function getMyPlayer(int $number): Player {
         return $this->getPlayer($this->getMySide(), $number);
+    }
+    
+    public function tryGetMyPlayer(int $number): ?Player {
+        return $this->tryGetPlayer($this->getMySide(), $number);
     }
     
     public function getOpponentPlayer(int $number): Player {
         return $this->getPlayer($this->getOpponentSide(), $number);
     }
+    
+    public function tryGetOpponentPlayer(int $number): ?Player {
+        return $this->tryGetPlayer($this->getOpponentSide(), $number);
+    }
 
-    public function getTeam(Side $side): ?Team {
+    public function getTeam(Side $side): Team {
         if($side === Side::HOME) {
             return $this->snapshot->getHomeTeam() ? Team::fromLugoTeam($this->snapshot->getHomeTeam()) : null;
         }
         return $this->snapshot->getAwayTeam() ? Team::fromLugoTeam($this->snapshot->getAwayTeam()) : null;
     }
 
-    public function getOpponentTeam(): ?Team {
+    public function getOpponentTeam(): Team {
         return $this->getTeam($this->getOpponentSide());
     }
 
@@ -139,8 +206,12 @@ class GameInspector implements IGameInspector {
         return $this->getOpponentTeam()?->getPlayers() ?? [];
     }
 
-    public function getOpponentGoalkeeper(): ?Player {
+    public function getOpponentGoalkeeper(): Player {
         return $this->getPlayer($this->getOpponentSide(), SPECS::GOALKEEPER_NUMBER);
+    }
+    
+    public function tryGetOpponentGoalkeeper(): ?Player {
+        return $this->tryGetPlayer($this->getOpponentSide(), SPECS::GOALKEEPER_NUMBER);
     }
 
     public function getOpponentScore(): float
@@ -243,10 +314,6 @@ class GameInspector implements IGameInspector {
 
     private function definePlayerState(): PlayerState
     {
-        if (!$this->getBall()) {
-            throw new RuntimeException('Estado de snapshot inválido - não é possível definir o estado do jogador.');
-        }
-
         $ballHolder = $this->getBall()->getHolder();
         if (!$ballHolder) {
             return PlayerState::DISPUTING;

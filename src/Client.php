@@ -111,7 +111,7 @@ class Client implements IClient {
 
     public function getOrderSet(GameInspector $inspector, IBot $bot): OrderSet
     {
-        $bot->beforeAction($inspector);
+        $bot->beforeActions($inspector);
 
         $playerState = $inspector->getMyState();
 
@@ -129,6 +129,9 @@ class Client implements IClient {
         $orderSet = new OrderSet();
         $orderSet->setTurn($inspector->getTurn());
         $orderSet->setOrders(array_values(array_filter($orders, fn($order) => $order instanceof Order)));
+
+        $bot->afterActions($inspector);
+
         return $orderSet;
     }
 

@@ -19,9 +19,13 @@ use Lugo\JumpOrder;
 use Lugo\KickOrder;
 use Lugo\MoveOrder;
 use Lugo\Order;
+use Lugo\Team_Side;
 
 test('DEVE lançar exceção se o jogador não for encontrado', function () {
     $snapshot = new GameSnapshot(); // Simulação do snapshot vazio
+	$snapshot->setHomeTeam(randomLugoTeam(Team_Side::HOME));
+	$snapshot->setAwayTeam(randomLugoTeam(Team_Side::AWAY));
+	$snapshot->getHomeTeam()->setPlayers([]);
     $botSide = Side::HOME;
 
     expect(fn() => new GameInspector($botSide, 1, $snapshot))
@@ -293,13 +297,6 @@ test('DEVE retornar uma ordem de movimentação para uma direção X com velocid
 	expect($order->getMove()->getVelocity()->getDirection())->toEqual($direction->toLugoVector());
 	expect($order->getMove()->getVelocity()->getSpeed())->toEqual(0);
 });
-
-test('DEVE lançar um erro ao tentar descobrir o estado do jogador sem aver uma bola', function () {
-	$botNumber = 11;
-    $snapshot = randomLugoGameSnapshot();
-	$snapshot->setBall(null);
-    new GameInspector(Side::HOME, $botNumber, $snapshot);
-})->throws(RuntimeException::class, 'Estado de snapshot inválido - não é possível definir o estado do jogador.');
 
 test('DEVE retornar corretamente o estado do jogador', function () {
     $inspector = randomGameInspectorInDefending(Side::HOME, 10);
