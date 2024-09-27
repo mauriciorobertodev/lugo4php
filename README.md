@@ -28,7 +28,7 @@
   </a>
 </p>
 
-![Alt text](https://raw.githubusercontent.com/mauriciorobertodev/lugo4php/main/src/assets/screenshot.png)
+![Alt text](https://raw.githubusercontent.com/mauriciorobertodev/lugo4php/main/screenshot.png)
 
 </div>
 
