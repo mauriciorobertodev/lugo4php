@@ -3,12 +3,14 @@
 use Lugo4php\GameInspector;
 use Lugo4php\Player;
 use Lugo4php\PlayerState;
+use Lugo4php\Point;
 use Lugo4php\Side;
 use Lugo4php\SPECS;
 use Lugo\Ball as LugoBall;
 use Lugo\GameSnapshot as LugoGameSnapshot;
 use Lugo\Player as LugoPlayer;
 use Lugo\Point as LugoPoint;
+use Lugo\ShotClock as LugoShotClock;
 use Lugo\Vector as LugoVector;
 use Lugo\Team as LugoTeam;
 use Lugo\Team_Side;
@@ -19,21 +21,21 @@ if (!function_exists('randomPositionable')) {
     function randomPositionable(): Positionable
     {
         $p = new Positionable();
-		$p->setX(rand(0, SPECS::FIELD_WIDTH));
-		$p->setY(rand(0, SPECS::FIELD_HEIGHT));
+		$p->setX(rand(0, SPECS::MAX_X_COORDINATE));
+		$p->setY(rand(0, SPECS::MAX_Y_COORDINATE));
 		return $p;
     }
 }
 
 
 if (!function_exists('randomPlayer')) {
-    function randomPlayer(): Player
+    function randomPlayer(?Point $position = null): Player
     {
         return new Player(
             rand(1, 11),
             false,
             Side::HOME,
-            randomPoint(),
+            $position ?? randomPoint(),
             randomPoint(),
             randomVelocity()
         ); 
@@ -70,8 +72,8 @@ if (!function_exists('randomLugoPoint')) {
     function randomLugoPoint(): LugoPoint
     {
         $p = new LugoPoint();
-		$p->setX(rand(0, SPECS::FIELD_WIDTH));
-		$p->setY(rand(0, SPECS::FIELD_HEIGHT));
+		$p->setX(rand(0, SPECS::MAX_X_COORDINATE));
+		$p->setY(rand(0, SPECS::MAX_Y_COORDINATE));
 		return $p;
     }
 }
@@ -80,8 +82,8 @@ if (!function_exists('randomLugoVector')) {
     function randomLugoVector(): LugoVector
     {
         $p = new LugoVector();
-		$p->setX(rand(0, SPECS::FIELD_WIDTH));
-		$p->setY(rand(0, SPECS::FIELD_HEIGHT));
+		$p->setX(rand(0, SPECS::MAX_X_COORDINATE));
+		$p->setY(rand(0, SPECS::MAX_Y_COORDINATE));
 		return $p;
     }
 }
@@ -176,6 +178,7 @@ if (!function_exists('randomLugoGameSnapshotInState')) {
             $ball = randomLugoBall();
             $ball->setHolder(array_values(array_filter([...$playerTeam->getPlayers()], fn(LugoPlayer $p) => $p->getNumber() === $number))[0]);
             $snapshot->setBall($ball);
+            $snapshot->setShotClock(randomLugoShotClock());
         }
 
         // A bola está com um bot to time do bot atual
@@ -216,5 +219,15 @@ if (!function_exists('randomGameInspectorInSupporting')) {
     function randomGameInspectorInSupporting(Side $side, int $number, LugoGameSnapshot|null $snapshot = null): GameInspector {
         $snapshot = randomLugoGameSnapshotInState($side, $number, PlayerState::SUPPORTING);
         return new GameInspector($side, $number, $snapshot);
+    }
+}
+
+if (!function_exists('randomLugoShotClock')) {
+    function randomLugoShotClock(): LugoShotClock
+    {
+        $clock = new LugoShotClock();
+        $clock->setRemainingTurns(rand(0, SPECS::SHOT_CLOCK_TIME));
+        $clock->setTeamSide(rand(0, 1));
+		return $clock;
     }
 }

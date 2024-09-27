@@ -55,3 +55,21 @@ test('DEVE criar uma instância de Team a partir de LugoTeam', function () {
     expect($team->getSide())->toBe(Side::HOME);
     expect($team->getPlayers())->toHaveCount(2);
 });
+
+test('DEVE retornar verdadeiro caso o jogador X esteja no time', function () {
+    $lugoTeam = new LugoTeam();
+    $lugoTeam->setName('TeamName');
+    $lugoTeam->setScore(3);
+    $lugoTeam->setSide(Side::HOME->value);
+
+    $lugoPlayer1 = randomLugoPlayer(rand(0,6));
+    $lugoPlayer2 = randomLugoPlayer(rand(7,11));
+
+    $lugoTeam->setPlayers([$lugoPlayer1]);
+
+    $team = Team::fromLugoTeam($lugoTeam);
+
+    expect($team->getPlayers())->toHaveCount(1);
+    expect($team->hasPlayer($lugoPlayer1->getNumber()))->toBeTrue();
+    expect($team->hasPlayer($lugoPlayer2->getNumber()))->toBeFalse();
+});

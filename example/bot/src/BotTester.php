@@ -16,6 +16,12 @@ class BotTester implements IBot
 
 	public function onDisputing(GameInspector $inspector): array
 	{
+		
+		if($inspector->getBallHolder()->getTeamSide() === $inspector->getMyTeamSide()) {
+			// humm, se o último holder foi alguém do meu time e agora a bolá, não está com ninguém... será que é um passe ?
+			// hummmmmmmm, nah.
+		}
+
 		$orders = [];
 		$ballPosition = $inspector->getBall()->getPosition();
 

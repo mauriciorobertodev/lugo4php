@@ -26,6 +26,7 @@ interface IGameInspector {
     public function getShotClock(): ?ShotClock;
 
     public function getBall(): Ball;
+    public function getBallHolder(): ?Player;
     public function getBallHasHolder(): bool;
     public function getBallTurnsInGoalZone(): int;
     public function getBallRemainingTurnsInGoalZone(): int;
@@ -40,7 +41,7 @@ interface IGameInspector {
     public function getMyState(): PlayerState;
     public function getMyTeam(): Team;
     public function getMyNumber(): int;
-    public function getMySide(): Side;
+    public function getMyTeamSide(): Side;
     public function getMyPosition(): Point;
     public function getMyDirection(): Vector2D;
     public function getMySpeed(): float;
@@ -76,9 +77,26 @@ interface IGameInspector {
     public function makeOrderLookAtPoint(Point $point): Order;
     public function makeOrderLookAtDirection(Vector2D $direction): Order;
 
-    public function makeOrderStop(): Order;
-
     public function makeOrderJumpToPoint(Point $target, ?float $speed): Order;
+
+    public function tryMakeOrderMoveToPoint(Point $point, ?float $speed): ?Order;
+    public function tryMakeOrderKickToPoint(Point $target, ?float $speed): ?Order;
+
+    public function tryMakeOrderMoveToDirection(Vector2D $direction, ?float $speed): ?Order;
+    public function tryMakeOrderKickToDirection(Vector2D $direction, ?float $speed): ?Order;
+    
+    public function tryMakeOrderMoveToRegion(IRegion $region, ?float $speed): ?Order;
+    public function tryMakeOrderKickToRegion(IRegion $region, ?float $speed): ?Order;
+    
+    public function tryMakeOrderMoveToPlayer(Player $player, ?float $speed): ?Order;
+    public function tryMakeOrderKickToPlayer(Player $player, ?float $speed): ?Order;
+    
+    public function tryMakeOrderLookAtPoint(Point $point): ?Order;
+    public function tryMakeOrderLookAtDirection(Vector2D $direction): ?Order;
+
+    public function tryMakeOrderJumpToPoint(Point $target, ?float $speed): ?Order;
+
+    public function makeOrderStop(): Order;
 
     public function makeOrderCatch(): Order;
 }

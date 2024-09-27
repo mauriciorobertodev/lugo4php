@@ -33,8 +33,8 @@ class Mapper implements IMapper {
             throw new \InvalidArgumentException("Número de linhas acima do máximo permitido");
         }
 
-        $this->regionWidth = SPECS::FIELD_WIDTH / $cols;
-        $this->regionHeight = SPECS::FIELD_HEIGHT / $rows;
+        $this->regionWidth = SPECS::MAX_X_COORDINATE / $cols;
+        $this->regionHeight = SPECS::MAX_Y_COORDINATE / $rows;
     }
 
     public function getCols(): int
@@ -45,7 +45,7 @@ class Mapper implements IMapper {
     public function setCols(int $cols): self
     {
         $this->cols = $cols;
-        $this->regionWidth = SPECS::FIELD_WIDTH / $cols;
+        $this->regionWidth = SPECS::MAX_X_COORDINATE / $cols;
 
         return $this;
     }
@@ -58,7 +58,7 @@ class Mapper implements IMapper {
     public function setRows(int $rows): self
     {
         $this->rows = $rows;
-        $this->regionHeight = SPECS::FIELD_HEIGHT / $rows;
+        $this->regionHeight = SPECS::MAX_Y_COORDINATE / $rows;
         return $this;
     }
 
@@ -125,8 +125,8 @@ class Mapper implements IMapper {
 
     private function mirrorCoordsToAway(Point $center): Point {
         $mirrored = new Point();
-        $mirrored->setX(SPECS::FIELD_WIDTH - $center->getX());
-        $mirrored->setY(SPECS::FIELD_HEIGHT - $center->getY());
+        $mirrored->setX(SPECS::MAX_X_COORDINATE - $center->getX());
+        $mirrored->setY(SPECS::MAX_Y_COORDINATE - $center->getY());
         return $mirrored;
     }
 }

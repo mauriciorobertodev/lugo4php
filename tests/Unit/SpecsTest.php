@@ -30,12 +30,12 @@ test('DEVE ter PLAYER_MAX_SPEED igual a 100.0', function () {
     expect(SPECS::PLAYER_MAX_SPEED)->toBe(100.0);
 });
 
-test('DEVE calcular MAX_X_COORDINATE como 200 vezes BASE_UNIT mais 1', function () {
-    expect(SPECS::MAX_X_COORDINATE)->toBe(200 * SPECS::BASE_UNIT + 1);
+test('DEVE calcular MAX_X_COORDINATE como 200 vezes BASE_UNIT', function () {
+    expect(SPECS::MAX_X_COORDINATE)->toBe(200 * SPECS::BASE_UNIT);
 });
 
-test('DEVE calcular MAX_Y_COORDINATE como 100 vezes BASE_UNIT mais 1', function () {
-    expect(SPECS::MAX_Y_COORDINATE)->toBe(100 * SPECS::BASE_UNIT + 1);
+test('DEVE calcular MAX_Y_COORDINATE como 100 vezes BASE_UNIT', function () {
+    expect(SPECS::MAX_Y_COORDINATE)->toBe(100 * SPECS::BASE_UNIT);
 });
 
 test('DEVE calcular BALL_SIZE como 2 vezes BASE_UNIT', function () {
@@ -66,10 +66,10 @@ test('DEVE calcular GOAL_MAX_Y corretamente', function () {
     expect(SPECS::GOAL_MAX_Y)->toBe(((100 * SPECS::BASE_UNIT - 30 * SPECS::BASE_UNIT) / 2) + 30 * SPECS::BASE_UNIT);
 });
 
-test('DEVE calcular FIELD_WIDTH como 200 vezes BASE_UNIT', function () {
-    expect(SPECS::FIELD_WIDTH)->toBe(200 * SPECS::BASE_UNIT);
+test('DEVE calcular FIELD_WIDTH como 200 vezes BASE_UNIT + 1', function () {
+    expect(SPECS::FIELD_WIDTH)->toBe(200 * SPECS::BASE_UNIT + 1);
 });
 
-test('DEVE calcular FIELD_HEIGHT como 100 vezes BASE_UNIT', function () {
-    expect(SPECS::FIELD_HEIGHT)->toBe(100 * SPECS::BASE_UNIT);
+test('DEVE calcular FIELD_HEIGHT como 100 vezes BASE_UNIT + 1', function () {
+    expect(SPECS::FIELD_HEIGHT)->toBe(100 * SPECS::BASE_UNIT + 1);
 });

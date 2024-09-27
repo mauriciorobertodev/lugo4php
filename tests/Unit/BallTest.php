@@ -1,10 +1,12 @@
 <?php
 
 use Lugo4php\Ball;
+use Lugo4php\Mapper;
 use Lugo4php\Player;
 use Lugo4php\Point;
 use Lugo4php\Velocity;
 use Lugo4php\Side;
+use Lugo4php\SPECS;
 use Lugo4php\Vector2D;
 use Lugo\Ball as LugoBall;
 
@@ -78,3 +80,47 @@ test('DEVE criar uma instância com base em um LugoBall', function () {
     expect($ballFromLugo->getVelocity())->toBeInstanceOf(Velocity::class);
     expect($ballFromLugo->getHolder())->toBeInstanceOf(Player::class);
 });
+
+test('DEVE retornar a direção e distancia para um player', function () {
+    $player2 = randomPlayer();
+    $ball = Ball::fromLugoBall(randomLugoBall());
+
+    $direction =  $ball->directionToPlayer($player2);
+    $distance = $ball->distanceToPlayer($player2);
+
+    expect($direction)->toEqual($ball->getPosition()->directionTo($player2->getPosition()));
+    expect($distance)->toEqual($ball->getPosition()->distanceTo($player2->getPosition()));
+});
+
+test('DEVE retornar a direção e distancia para um ponto', function () {
+    $point = randomPoint();
+    $ball = Ball::fromLugoBall(randomLugoBall());
+
+    $direction =  $ball->directionToPoint($point);
+    $distance = $ball->distanceToPoint($point);
+
+    expect($direction)->toEqual($ball->getPosition()->directionTo($point));
+    expect($distance)->toEqual($ball->getPosition()->distanceTo($point));
+});
+
+test('DEVE retornar a direção e distancia para uma região', function () {
+    $mapper = new Mapper(10, 10, Side::HOME);
+    $region = $mapper->getRandomRegion();
+    $ball = Ball::fromLugoBall(randomLugoBall());
+    
+
+    $direction =  $ball->directionToRegion($region);
+    $distance = $ball->distanceToRegion($region);
+
+    expect($direction)->toEqual($ball->getPosition()->directionTo($region->getCenter()));
+    expect($distance)->toEqual($ball->getPosition()->distanceTo($region->getCenter()));
+});
+
+test('DEVE criar uma bola no posição no centro do campo e velocity zerada', function () {
+    $ball = Ball::newZeroed();
+    
+    expect($ball->getPosition())->toEqual(new Point(SPECS::FIELD_CENTER_X, SPECS::FIELD_CENTER_Y));
+    expect($ball->getDirection())->toEqual(new Vector2D(0, 0));
+    expect($ball->getSpeed())->toEqual(0);
+});
+

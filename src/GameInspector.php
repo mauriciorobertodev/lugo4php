@@ -45,7 +45,7 @@ class GameInspector implements IGameInspector {
 
     public function getShotClock(): ?ShotClock
     {
-        return ShotClock::createFromLugoShotClock($this->snapshot->getShotClock());
+        return ShotClock::fromLugoShotClock($this->snapshot->getShotClock());
     }
 
     public function getMyState(): PlayerState {
@@ -53,7 +53,7 @@ class GameInspector implements IGameInspector {
     }
 
     public function getMyTeam(): Team {
-        return $this->getTeam($this->getMySide());
+        return $this->getTeam($this->getMyTeamSide());
     }
 
     public function getMyNumber(): int {
@@ -65,7 +65,7 @@ class GameInspector implements IGameInspector {
         return new Point(SPECS::FIELD_CENTER_X, SPECS::FIELD_CENTER_Y);
     }
 
-    public function getMySide(): Side {
+    public function getMyTeamSide(): Side {
         return $this->getMe()->getTeamSide();
     }
 
@@ -95,11 +95,11 @@ class GameInspector implements IGameInspector {
     }
 
     public function getMyGoalkeeper(): Player {
-        return $this->getPlayer($this->getMySide(), SPECS::GOALKEEPER_NUMBER);
+        return $this->getPlayer($this->getMyTeamSide(), SPECS::GOALKEEPER_NUMBER);
     }
     
     public function tryGetMyGoalkeeper(): ?Player {
-        return $this->tryGetPlayer($this->getMySide(), SPECS::GOALKEEPER_NUMBER);
+        return $this->tryGetPlayer($this->getMyTeamSide(), SPECS::GOALKEEPER_NUMBER);
     }
 
     public function getMyScore(): float
@@ -109,6 +109,11 @@ class GameInspector implements IGameInspector {
 
     public function getBall(): Ball {
         return  $this->snapshot->getBall() ? Ball::fromLugoBall($this->snapshot->getBall()) : Ball::newZeroed();
+    }
+
+    public function getBallHolder(): ?Player
+    {
+        return $this->getBall()->getHolder();
     }
 
     public function getBallHasHolder(): bool
@@ -171,11 +176,11 @@ class GameInspector implements IGameInspector {
     }
     
     public function getMyPlayer(int $number): Player {
-        return $this->getPlayer($this->getMySide(), $number);
+        return $this->getPlayer($this->getMyTeamSide(), $number);
     }
     
     public function tryGetMyPlayer(int $number): ?Player {
-        return $this->tryGetPlayer($this->getMySide(), $number);
+        return $this->tryGetPlayer($this->getMyTeamSide(), $number);
     }
     
     public function getOpponentPlayer(int $number): Player {
@@ -198,7 +203,7 @@ class GameInspector implements IGameInspector {
     }
 
     public function getOpponentSide(): Side {
-        return $this->getMySide() === Side::HOME ? Side::AWAY : Side::HOME;
+        return $this->getMyTeamSide() === Side::HOME ? Side::AWAY : Side::HOME;
     }
 
     /** @return Player[] */
@@ -220,28 +225,17 @@ class GameInspector implements IGameInspector {
     }
 
     public function getDefenseGoal(): Goal {
-        return $this->getMySide() === Side::HOME ? Goal::HOME() : Goal::AWAY();
+        return $this->getMyTeamSide() === Side::HOME ? Goal::HOME() : Goal::AWAY();
     }
 
     public function getAttackGoal(): Goal {
-        return $this->getMySide() === Side::HOME ? Goal::AWAY() : Goal::HOME();
-    }
-
-    public function makeOrderMoveToPoint(Point $point, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
-        $direction = $this->getMe()->getPosition()->directionTo($point);
-        return $this->makeOrderMoveToDirection($direction, $speed);
-    }
-
-    public function makeOrderKickToPoint(Point $point, ?float $speed = SPECS::BALL_MAX_SPEED): Order
-    {
-        $ballPosition = $this->getBall()?->getPosition() ?? new Point();
-        $ballDirection = $ballPosition->directionTo($point);
-
-        return $this->makeOrderKickToDirection($ballDirection, $speed);
+        return $this->getMyTeamSide() === Side::HOME ? Goal::AWAY() : Goal::HOME();
     }
 
     public function makeOrderMoveToDirection(Vector2D $direction, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order
     {
+        if($direction->is(new Vector2D(0,0))) throw new RuntimeException(sprintf("Direção %s inválida.", $direction));
+
         $vel = new Velocity($direction, $speed); 
 
         $moveOrder = new MoveOrder();
@@ -252,6 +246,8 @@ class GameInspector implements IGameInspector {
 
     public function makeOrderKickToDirection(Vector2D $direction, ?float $speed = SPECS::BALL_MAX_SPEED): Order
     {
+        if($direction->is(new Vector2D(0,0))) throw new RuntimeException(sprintf("Direção %s inválida.", $direction));
+
         $vel = new Velocity($direction, $speed);
 
         $kick = new KickOrder();
@@ -260,28 +256,24 @@ class GameInspector implements IGameInspector {
         return (new Order())->setKick($kick);
     }
 
-    public function makeOrderMoveToRegion(IRegion $region, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
-        $direction = $this->getMyPosition()->directionTo($region->getCenter());
+    public function makeOrderMoveToPoint(Point $point, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        $direction = $this->getMyPosition()->directionTo($point);
         return $this->makeOrderMoveToDirection($direction, $speed);
+    }
+
+    public function makeOrderKickToPoint(Point $point, ?float $speed = SPECS::BALL_MAX_SPEED): Order
+    {
+        $direction = $this->getBallPosition()->directionTo($point);
+        return $this->makeOrderKickToDirection($direction, $speed);
+    }
+
+    public function makeOrderMoveToRegion(IRegion $region, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
+        return $this->makeOrderMoveToPoint($region->getCenter(), $speed);
     }
 
     public function makeOrderKickToRegion(IRegion $region, ?float $speed = SPECS::BALL_MAX_SPEED): Order
     {
-        $direction = $this->getMyPosition()->directionTo($region->getCenter());
-        return $this->makeOrderKickToDirection($direction, $speed);
-    }
-
-    public function makeOrderJumpToPoint(Point $point, ?float $speed = SPECS::GOALKEEPER_JUMP_MAX_SPEED): Order
-    {
-        $origin = $this->getMyPosition();
-        $direction = $origin->directionTo($point);
-        $upOrDown = $direction->getY() > 0 ? new Vector2D(0, 1) : new Vector2D(0, -1);
-        $vel = new Velocity($upOrDown, $speed);
-
-        $jump = new JumpOrder();
-        $jump->setVelocity($vel->toLugoVelocity());
-
-        return (new Order())->setJump($jump);
+        return $this->makeOrderKickToPoint($region->getCenter(), $speed);
     }
 
     public function makeOrderMoveToPlayer(Player $player, ?float $speed = SPECS::PLAYER_MAX_SPEED): Order {
@@ -300,6 +292,98 @@ class GameInspector implements IGameInspector {
     public function makeOrderLookAtDirection(Vector2D $direction): Order
     {
         return $this->makeOrderMoveToDirection($direction, 0);
+    }
+
+    public function makeOrderJumpToPoint(Point $point, ?float $speed = SPECS::GOALKEEPER_JUMP_MAX_SPEED): Order
+    {
+        $origin = $this->getMyPosition();
+        $direction = $origin->directionTo($point);
+        if($direction->is(new Vector2D(0,0))) throw new RuntimeException(sprintf("Direção %s inválida.", $direction));
+        $upOrDown = $direction->getY() > 0 ? new Vector2D(0, 1) : new Vector2D(0, -1);
+        $vel = new Velocity($upOrDown, $speed);
+
+        $jump = new JumpOrder();
+        $jump->setVelocity($vel->toLugoVelocity());
+
+        return (new Order())->setJump($jump);
+    }
+
+    public function tryMakeOrderMoveToDirection(Vector2D $direction, ?float $speed = SPECS::PLAYER_MAX_SPEED): ?Order
+    {
+        if($direction->is(new Vector2D(0,0))) return null;
+
+        $vel = new Velocity($direction, $speed); 
+
+        $moveOrder = new MoveOrder();
+        $moveOrder->setVelocity($vel->toLugoVelocity());
+
+        return (new Order())->setMove($moveOrder);
+    }
+
+    public function tryMakeOrderKickToDirection(Vector2D $direction, ?float $speed = SPECS::BALL_MAX_SPEED): ?Order
+    {
+        if($direction->is(new Vector2D(0,0))) return null;
+
+        $vel = new Velocity($direction, $speed);
+
+        $kick = new KickOrder();
+        $kick->setVelocity($vel->toLugoVelocity());
+
+        return (new Order())->setKick($kick);
+    }
+
+    public function tryMakeOrderMoveToPoint(Point $point, ?float $speed = SPECS::PLAYER_MAX_SPEED): ?Order {
+        $direction = $this->getMe()->getPosition()->directionTo($point);
+        return $this->tryMakeOrderMoveToDirection($direction, $speed);
+    }
+
+    public function tryMakeOrderKickToPoint(Point $point, ?float $speed = SPECS::BALL_MAX_SPEED): ?Order
+    {
+        $ballPosition = $this->getBall()?->getPosition() ?? new Point();
+        $ballDirection = $ballPosition->directionTo($point);
+
+        return $this->tryMakeOrderKickToDirection($ballDirection, $speed);
+    }
+
+    public function tryMakeOrderMoveToRegion(IRegion $region, ?float $speed = SPECS::PLAYER_MAX_SPEED): ?Order {
+        return $this->tryMakeOrderMoveToPoint($region->getCenter(), $speed);
+    }
+
+    public function tryMakeOrderKickToRegion(IRegion $region, ?float $speed = SPECS::BALL_MAX_SPEED): ?Order
+    {
+        return $this->tryMakeOrderKickToPoint($region->getCenter(), $speed);
+    }
+
+    public function tryMakeOrderMoveToPlayer(Player $player, ?float $speed = SPECS::PLAYER_MAX_SPEED): ?Order {
+        return $this->tryMakeOrderMoveToPoint($player->getPosition(), $speed);
+    }
+
+    public function tryMakeOrderKickToPlayer(Player $player, ?float $speed = SPECS::BALL_MAX_SPEED): ?Order {
+        return $this->tryMakeOrderKickToPoint($player->getPosition(), $speed);
+    }
+
+    public function tryMakeOrderLookAtPoint(Point $point): ?Order
+    {
+        return $this->tryMakeOrderLookAtDirection($this->getMyPosition()->directionTo($point));
+    }
+    
+    public function tryMakeOrderLookAtDirection(Vector2D $direction): ?Order
+    {
+        return $this->tryMakeOrderMoveToDirection($direction, 0);
+    }
+
+    public function tryMakeOrderJumpToPoint(Point $point, ?float $speed = SPECS::GOALKEEPER_JUMP_MAX_SPEED): ?Order
+    {
+        $origin = $this->getMyPosition();
+        $direction = $origin->directionTo($point);
+        if($direction->is(new Vector2D(0,0))) return null;
+        $upOrDown = $direction->getY() > 0 ? new Vector2D(0, 1) : new Vector2D(0, -1);
+        $vel = new Velocity($upOrDown, $speed);
+
+        $jump = new JumpOrder();
+        $jump->setVelocity($vel->toLugoVelocity());
+
+        return (new Order())->setJump($jump);
     }
 
     public function makeOrderStop(): Order
@@ -323,7 +407,7 @@ class GameInspector implements IGameInspector {
             return PlayerState::HOLDING;
         }
         
-        if($ballHolder->getTeamSide() === $this->getMySide()) {
+        if($ballHolder->getTeamSide() === $this->getMyTeamSide()) {
             return PlayerState::SUPPORTING;
         }
 

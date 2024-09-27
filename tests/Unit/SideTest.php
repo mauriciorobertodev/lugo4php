@@ -25,3 +25,17 @@ test('DEVE converter Side::AWAY para a string "away"', function () {
     $side = Side::AWAY;
     expect($side->toString())->toBe('away');
 });
+
+test('DEVE converter o int 0 para Side::HOME', function () {
+    $side = Side::fromInt(0);
+    expect($side)->toBe(Side::HOME);
+});
+
+test('DEVE converter o int 1 para Side::AWAY', function () {
+    $side = Side::fromInt(1);
+    expect($side)->toBe(Side::AWAY);
+});
+
+test('DEVE lançar exceção para um int inválido no método fromInt', function () {
+    expect(fn() => Side::fromInt(50))->toThrow(\InvalidArgumentException::class, "Valor inválido para o lado do time: '50'");
+});

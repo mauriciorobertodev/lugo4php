@@ -20,12 +20,12 @@ test("DEVE definir e retornar as colunas e linhas corretamente", function() {
 test("DEVE retornar a largura e altura das regiões", function() {
 	$mapper = new Mapper(10, 10, Side::HOME);
 
-	expect($mapper->getRegionWidth())->toEqual(SPECS::FIELD_WIDTH / 10);
-	expect($mapper->getRegionHeight())->toEqual(SPECS::FIELD_HEIGHT / 10);
+	expect($mapper->getRegionWidth())->toEqual(SPECS::MAX_X_COORDINATE / 10);
+	expect($mapper->getRegionHeight())->toEqual(SPECS::MAX_Y_COORDINATE / 10);
 
 	$mapper->setCols(22)->setRows(33);	
-	expect($mapper->getRegionWidth())->toEqual(SPECS::FIELD_WIDTH / 22);
-	expect($mapper->getRegionHeight())->toEqual(SPECS::FIELD_HEIGHT / 33);
+	expect($mapper->getRegionWidth())->toEqual(SPECS::MAX_X_COORDINATE / 22);
+	expect($mapper->getRegionHeight())->toEqual(SPECS::MAX_Y_COORDINATE / 33);
 });
 
 test('DEVE retornar a região correta dado as coordenadas', function() {

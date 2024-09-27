@@ -27,7 +27,7 @@ class ShotClock implements IShotClock
 		return $this->side;
 	}
 
-	public static function createFromLugoShotClock(LugoShotClock $lugoShotClock): ShotClock
+	public static function fromLugoShotClock(LugoShotClock $lugoShotClock): ShotClock
 	{
 		$side = Side::fromInt($lugoShotClock->getTeamSide());
 		$remainingTurns = $lugoShotClock->getRemainingTurns() ?? SPECS::SHOT_CLOCK_TIME;

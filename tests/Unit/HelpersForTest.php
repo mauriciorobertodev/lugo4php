@@ -12,7 +12,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de HOLDING', function(
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::HOME);
+		expect($inspector->getMyTeamSide())->toBe(Side::HOME);
 		expect($inspector->getMyState())->toBe(PlayerState::HOLDING);
 	}
 	
@@ -22,7 +22,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de HOLDING', function(
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::AWAY);
+		expect($inspector->getMyTeamSide())->toBe(Side::AWAY);
 		expect($inspector->getMyState())->toBe(PlayerState::HOLDING);
 	}
 });
@@ -34,7 +34,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de DISPUTING', functio
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::HOME);
+		expect($inspector->getMyTeamSide())->toBe(Side::HOME);
 		expect($inspector->getMyState())->toBe(PlayerState::DISPUTING);
 	}
 	
@@ -44,7 +44,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de DISPUTING', functio
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::AWAY);
+		expect($inspector->getMyTeamSide())->toBe(Side::AWAY);
 		expect($inspector->getMyState())->toBe(PlayerState::DISPUTING);
 	}
 });
@@ -56,7 +56,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de SUPPORTING', functi
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::HOME);
+		expect($inspector->getMyTeamSide())->toBe(Side::HOME);
 		expect($inspector->getMyState())->toBe(PlayerState::SUPPORTING);
 	}
 	
@@ -66,7 +66,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de SUPPORTING', functi
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::AWAY);
+		expect($inspector->getMyTeamSide())->toBe(Side::AWAY);
 		expect($inspector->getMyState())->toBe(PlayerState::SUPPORTING);
 	}
 });
@@ -78,7 +78,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de DEFENDING', functio
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::HOME);
+		expect($inspector->getMyTeamSide())->toBe(Side::HOME);
 		expect($inspector->getMyState())->toBe(PlayerState::DEFENDING);
 	}
 	
@@ -88,7 +88,7 @@ test('DEVE gerar um GameInspector aleatório em um estado de DEFENDING', functio
 		expect($inspector)->toBeInstanceOf(GameInspector::class);
 		expect($inspector->getMe())->toBeInstanceOf(Player::class);
 		expect($inspector->getMyNumber())->toBe(10);
-		expect($inspector->getMySide())->toBe(Side::AWAY);
+		expect($inspector->getMyTeamSide())->toBe(Side::AWAY);
 		expect($inspector->getMyState())->toBe(PlayerState::DEFENDING);
 	}
 });

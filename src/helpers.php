@@ -19,8 +19,8 @@ if (!function_exists('randomPoint')) {
     function randomPoint()
     {
         return new Point(
-            rand(0, SPECS::FIELD_WIDTH),
-            rand(0, SPECS::FIELD_HEIGHT),
+            rand(0, SPECS::MAX_X_COORDINATE),
+            rand(0, SPECS::MAX_Y_COORDINATE),
         );
     }
 }
@@ -29,8 +29,8 @@ if (!function_exists('randomDirection')) {
     function randomDirection()
     {
         return (new Vector2D(
-            rand(0, SPECS::FIELD_WIDTH),
-            rand(0, SPECS::FIELD_HEIGHT),
+            rand(0, SPECS::MAX_X_COORDINATE),
+            rand(0, SPECS::MAX_Y_COORDINATE),
         ))->normalize();
     }
 }
