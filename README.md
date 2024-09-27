@@ -53,7 +53,7 @@ Lugo4PHP é um pacote feito em PHP criado para conectar um bot com servidor do [
 - Vários métodos alternativos para gerar uma ordem, por exemplo `$inspector->makeOrderLookAtDirection($direction)`, `$inspector->makeOrderMoveToRegion($region)`, `$inspector->makeOrderKickToPlayer($player)` e outros...
 - Vários métodos com duplicados, podendo optar por um que lança uma exceção ou um retorno nulo, por exemplo `$inspector->getMyPlayer(10)` (lança um erro caso o jogador não exista) e `$inspector->tryGetMyPlayer(10)` (retorna null caso o jogador não exista).
 - 94% do código coberto por testes automatizados, facilitando o incremento de novas funcionalidades, com uma change muito menor de quebrar as já existentes.
-- Totalmente documentada, para uma busca rápida, acesse: [Lugo4php Docs](lugo4php.mauricioroberto.com).
+- Totalmente documentada, para uma busca rápida, acesse: [Lugo4php Docs](https://lugo4php.mauricioroberto.com).
 
 
 <br>
