@@ -8,8 +8,9 @@ RUN apt-get install -y zlib1g-dev
 RUN apt-get install -y autoconf
 RUN apt-get install -y gcc
 RUN apt-get install -y make
+RUN apt-get install -y git
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
 RUN pecl install grpc
 

@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Criador de estratégias para Lugo Bots</h1>
+  <h1>Lugo 4 PHP</h1>
 
   <p>
     Cliente em PHP para criar <a href="https://lugobots.ai/">Lugo Bots</a>
